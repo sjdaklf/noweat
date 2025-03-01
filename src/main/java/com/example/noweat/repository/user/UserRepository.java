@@ -3,6 +3,8 @@ package com.example.noweat.repository.user;
 import com.example.noweat.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+import java.util.Optional;
 
+public interface UserRepository extends JpaRepository<User, Long> {
+    boolean existsByEmail(String email);
 }
