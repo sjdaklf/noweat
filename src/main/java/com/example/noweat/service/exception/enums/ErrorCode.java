@@ -28,6 +28,7 @@ public enum ErrorCode {
     // 404 에러
     NOT_FOUND_USER("존재하지 않는 유저입니다.", HttpStatus.NOT_FOUND),
     STORE_NOT_EXIST("가게를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    MENU_NOT_EXIST("메뉴를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     NOT_FOUND_REFRESH_TOKEN("존재하지 않는 RefreshToken 입니다.", HttpStatus.NOT_FOUND),
 
     //409 에러
