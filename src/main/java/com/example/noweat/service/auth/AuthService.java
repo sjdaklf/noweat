@@ -4,7 +4,11 @@ import com.example.noweat.domain.user.User;
 import com.example.noweat.domain.user.UserRole;
 import com.example.noweat.dto.auth.reponse.UserSingupResponseDto;
 import com.example.noweat.dto.auth.request.UserSingupRequestDto;
+import com.example.noweat.global.config.PasswordEncoder;
 import com.example.noweat.repository.user.UserRepository;
+import com.example.noweat.service.exception.BadRequestException;
+import com.example.noweat.service.exception.ConflictException;
+import com.example.noweat.service.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,15 +16,22 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
     public UserSingupResponseDto signupUser(UserSingupRequestDto userSingupRequestDto){
 
-        UserRole userRole = UserRole.of(userSingupRequestDto.getUserRole());
+        if(userRepository.existsByEmail(userSingupRequestDto.getEmail())){
+            throw new ConflictException(ErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+
+        UserRole userRole = UserRole.of(userSingupRequestDto.getUserRole()).orElseThrow(() -> new BadRequestException(ErrorCode.INVALID_USER_ROLE));
+
+        String encodedPassword = passwordEncoder.encode(userSingupRequestDto.getPassword());
 
         User user = User.builder()
                 .email(userSingupRequestDto.getEmail())
-                .password(userSingupRequestDto.getPassword())
+                .password(encodedPassword)
                 .userAddress(userSingupRequestDto.getUserAddress())
                 .username(userSingupRequestDto.getUsername())
                 .userRole(userRole)
