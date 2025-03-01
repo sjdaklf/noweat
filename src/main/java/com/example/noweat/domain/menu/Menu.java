@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @NoArgsConstructor
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class Menu extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,5 +39,14 @@ public class Menu extends BaseEntity {
         this.menuName = menuName;
         this.menuPrice = menuPrice;
         this.isDeleted = isDeleted;
+    }
+
+    public void updateMenu(String menuName, Long menuPrice) {
+        this.menuName = menuName;
+        this.menuPrice = menuPrice;
+    }
+
+    public void deleteMenu() {
+        this.isDeleted = true;
     }
 }
