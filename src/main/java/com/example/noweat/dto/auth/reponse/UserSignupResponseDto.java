@@ -8,7 +8,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class UserSingupResponseDto {
+public class UserSignupResponseDto {
     private final Long id;
 
     private final String username;
@@ -19,7 +19,7 @@ public class UserSingupResponseDto {
     private final LocalDateTime createdAt;
 
     @Builder
-    public UserSingupResponseDto(Long id, String username, UserRole userRole, LocalDateTime createdAt){
+    public UserSignupResponseDto(Long id, String username, UserRole userRole, LocalDateTime createdAt){
         this.id = id;
         this.username = username;
         this.userRole = userRole;

@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
-public class UserSingupRequestDto {
+public class UserSigninRequestDto {
     @NotBlank(message = "이메일은 필수 값 입니다.")
     @Email(regexp = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$", message = "올바른 이메일 형식을 입력해 주세요.")
     private String email;
@@ -17,12 +17,6 @@ public class UserSingupRequestDto {
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\w\\s]).*$", message = "대소문자 포함 영문+숫자+특수문자를 최소 1글자씩 포함해야 됩니다.")
     private String password;
 
-    @NotBlank(message = "유저 주소는 필수 값 입니다.")
-    private String userAddress;
-
-    @NotBlank(message = "유저이름은 필수 값 입니다.")
-    private String username;
-
-    @NotBlank(message = "유저 역할은 필수 값 입니다.")
-    private String userRole;
+    @NotBlank(message = "DeviceId는 필수 값 입니다.")
+    private String deviceId;
 }
