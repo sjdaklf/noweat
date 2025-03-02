@@ -1,8 +1,10 @@
 package com.example.noweat.controller.auth;
 
 import com.example.noweat.domain.user.UserRole;
+import com.example.noweat.dto.auth.reponse.RefreshTokenResponseDto;
 import com.example.noweat.dto.auth.reponse.UserSigninResponseDto;
 import com.example.noweat.dto.auth.reponse.UserSignupResponseDto;
+import com.example.noweat.dto.auth.request.RefreshTokenRequestDto;
 import com.example.noweat.dto.auth.request.UserSigninRequestDto;
 import com.example.noweat.dto.auth.request.UserSignupRequestDto;
 import com.example.noweat.dto.auth.request.UserSingoutRequestDto;
@@ -44,4 +46,11 @@ public class AuthController {
     public void signoutUser(AuthUser authUser, @Valid @RequestBody UserSingoutRequestDto userSingoutRequestDto){
         authService.signout(authUser.getId(), userSingoutRequestDto.getDeviceId());
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<RefreshTokenResponseDto> refreshToken(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto){
+        RefreshTokenResponseDto refreshTokenResponseDto = authService.refreshToken(refreshTokenRequestDto);
+        return new ResponseEntity<>(refreshTokenResponseDto, HttpStatus.OK);
+    }
+
 }

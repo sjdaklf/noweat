@@ -3,8 +3,10 @@ package com.example.noweat.service.auth;
 import com.example.noweat.domain.auth.RefreshToken;
 import com.example.noweat.domain.user.User;
 import com.example.noweat.domain.user.UserRole;
+import com.example.noweat.dto.auth.reponse.RefreshTokenResponseDto;
 import com.example.noweat.dto.auth.reponse.UserSigninResponseDto;
 import com.example.noweat.dto.auth.reponse.UserSignupResponseDto;
+import com.example.noweat.dto.auth.request.RefreshTokenRequestDto;
 import com.example.noweat.dto.auth.request.UserSigninRequestDto;
 import com.example.noweat.dto.auth.request.UserSignupRequestDto;
 import com.example.noweat.global.config.PasswordEncoder;
@@ -16,8 +18,10 @@ import com.example.noweat.service.exception.ConflictException;
 import com.example.noweat.service.exception.NotFoundException;
 import com.example.noweat.service.exception.UnauthorizedException;
 import com.example.noweat.service.exception.enums.ErrorCode;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -102,4 +106,35 @@ public class AuthService {
         refreshTokenRepository.deleteByUser_IdAndDeviceId(userId, deviceId);
     }
 
+    @Transactional
+    public RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto refreshTokenRequestDto){
+
+        // 만료된 토큰인지 검사
+        Claims claims = jwtUtil.getRefreshTokenClaims(refreshTokenRequestDto.getRefreshToken());
+
+        // 토큰 찾아오기
+        RefreshToken findRefreshToken = refreshTokenRepository.findByRefreshToken(refreshTokenRequestDto.getRefreshToken()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_REFRESH_TOKEN));
+
+        Long userId = Long.parseLong((String)claims.getSubject());
+        String email = (String)claims.get("email");
+        UserRole userRole = UserRole.of((String)claims.get("userRole"));
+
+        String accessToken = jwtUtil.createAccessToken(userId, email, userRole);
+        String refreshToken = jwtUtil.createRefreshToken(userId, email, userRole);
+
+        // 현재 db에 있는 토큰 삭제
+        refreshTokenRepository.deleteById(findRefreshToken.getId());
+
+        // 리프레시 토큰 저장
+        refreshTokenRepository.save(RefreshToken.builder()
+                .user(findRefreshToken.getUser())
+                .deviceId(findRefreshToken.getDeviceId())
+                .refreshToken(refreshToken)
+                .build());
+
+        return RefreshTokenResponseDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
 }
