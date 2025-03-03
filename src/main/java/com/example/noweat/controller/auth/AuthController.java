@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class AuthController {
     private final AuthService authService;
-    private final ValidatorFactory validatorFactory;
 
     @PostMapping("/signup")
     public ResponseEntity<UserSignupResponseDto> signupUser(@Valid @RequestBody UserSignupRequestDto userSignupRequestDto){
