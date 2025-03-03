@@ -62,9 +62,6 @@ public class UserService {
         verifyUser(findUser);
 
         List<Store> findStores = storeRepository.findStoresByUserId(findUser.getId());
-        if (findStores.isEmpty()) {
-            throw new NotFoundException(ErrorCode.NOT_FOUND_STORE);
-        }
 
         List<UserStoreResponseDto> storeList= new ArrayList<>();
         for (Store store : findStores) {
@@ -94,9 +91,6 @@ public class UserService {
         verifyUser(findUser);
 
         List<Review> findReviews = reviewRepository.findReviewsByUserId(findUser.getId());
-        if (findReviews.isEmpty()) {
-            throw new NotFoundException(ErrorCode.NOT_FOUND_REVIEW);
-        }
 
         List<UserReviewResponseDto> reviewList= new ArrayList<>();
         for (Review review : findReviews) {
