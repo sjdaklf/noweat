@@ -21,6 +21,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -30,12 +33,10 @@ public class UserService {
     private final ReviewRepository reviewRepository;
 
     @Transactional(readOnly = true)
-    public UserResponseDto getUser(AuthUser authUser) {
+    public UserResponseDto findUser(AuthUser authUser) {
 
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
-        // 유저 삭제 됐는지 확인하는 함수
-        // 어떻게 하면 좋을까요? 필터?
         verifyUser(findUser);
 
         return UserResponseDto.builder()
@@ -50,7 +51,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserStoreResponseDto getStoreByUser(AuthUser authUser) {
+    public List<UserStoreResponseDto> findStoresByUserId(AuthUser authUser) {
 
         if (authUser.getUserRole() != UserRole.OWNER) {
             throw new UnauthorizedException(ErrorCode.NOT_OWNER);
@@ -60,19 +61,29 @@ public class UserService {
 
         verifyUser(findUser);
 
-        Store findStore = storeRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_STORE));
+        List<Store> findStores = storeRepository.findStoresByUserId(findUser.getId());
+        if (findStores.isEmpty()) {
+            throw new NotFoundException(ErrorCode.NOT_FOUND_STORE);
+        }
 
-        return UserStoreResponseDto.builder()
-                .id(findUser.getId())
-                .storeName(findStore.getStoreName())
-                .storeCategory(findStore.getStoreCategory())
-                .minOrderPrice(findStore.getMinOrderPrice())
-                .averageRating(findStore.getAverageRating())
-                .build();
+        List<UserStoreResponseDto> storeList= new ArrayList<>();
+        for (Store store : findStores) {
+            UserStoreResponseDto userStoreResponseDto = new UserStoreResponseDto(
+                    store.getId(),
+                    store.getStoreName(),
+                    store.getStoreCategory(),
+                    store.getMinOrderPrice(),
+                    store.getAverageRating()
+                    );
+
+            storeList.add(userStoreResponseDto);
+        }
+
+        return storeList;
     }
 
     @Transactional(readOnly = true)
-    public UserReviewResponseDto getReviewByUser(AuthUser authUser) {
+    public List<UserReviewResponseDto> findReviewsByUserId(AuthUser authUser) {
 
         if (authUser.getUserRole() != UserRole.USER) {
             throw new UnauthorizedException(ErrorCode.NOT_USER);
@@ -82,19 +93,28 @@ public class UserService {
 
         verifyUser(findUser);
 
-        Review findReview = reviewRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_REVIEW));
+        List<Review> findReviews = reviewRepository.findReviewsByUserId(findUser.getId());
+        if (findReviews.isEmpty()) {
+            throw new NotFoundException(ErrorCode.NOT_FOUND_REVIEW);
+        }
 
-        return UserReviewResponseDto.builder()
-                .id(findUser.getId())
-                .title(findReview.getTitle())
-                .content(findReview.getContent())
-                .starRating(findReview.getStarRating())
-                .createdAt(findReview.getCreatedAt())
-                .updatedAt(findReview.getUpdatedAt())
-                .build();
+        List<UserReviewResponseDto> reviewList= new ArrayList<>();
+        for (Review review : findReviews) {
+            UserReviewResponseDto userReviewResponseDto = new UserReviewResponseDto(
+                    review.getId(),
+                    review.getTitle(),
+                    review.getContent(),
+                    review.getStarRating(),
+                    review.getCreatedAt(),
+                    review.getUpdatedAt()
+            );
+
+            reviewList.add(userReviewResponseDto);
+        }
+
+        return reviewList;
     }
 
-    @Transactional
     public UserUpdateNameAndAddressResponseDto updateUserNameAndAddress(AuthUser authUser, UserUpdateNameAndAddressRequestDto userUpdateNameAndAddressRequestDto) {
 
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
@@ -103,18 +123,19 @@ public class UserService {
 
         findUser.updateUserNameAndAddress(userUpdateNameAndAddressRequestDto.getUsername(), userUpdateNameAndAddressRequestDto.getUserAddress());
 
+        User savedUser = userRepository.save(findUser);
+
         return UserUpdateNameAndAddressResponseDto.builder()
-                .id(findUser.getId())
-                .username(findUser.getUsername())
-                .userAddress(findUser.getUserAddress())
-                .userRole(findUser.getUserRole())
-                .storeCount(findUser.getStoreCount())
-                .createdAt(findUser.getCreatedAt())
-                .updatedAt(findUser.getUpdatedAt())
+                .id(savedUser.getId())
+                .username(savedUser.getUsername())
+                .userAddress(savedUser.getUserAddress())
+                .userRole(savedUser.getUserRole())
+                .storeCount(savedUser.getStoreCount())
+                .createdAt(savedUser.getCreatedAt())
+                .updatedAt(savedUser.getUpdatedAt())
                 .build();
     }
 
-    @Transactional
     public UserUpdatePasswordResponseDto updateUserPassword(AuthUser authUser, UserUpdatePasswordRequestDto userUpdatePasswordRequestDto) {
 
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
@@ -131,14 +152,16 @@ public class UserService {
 
         findUser.updatePassword(passwordEncoder.encode(userUpdatePasswordRequestDto.getNewPassword()));
 
+        User savedUser = userRepository.save(findUser);
+
         return UserUpdatePasswordResponseDto.builder()
-                .id(findUser.getId())
-                .username(findUser.getUsername())
-                .userAddress(findUser.getUserAddress())
-                .userRole(findUser.getUserRole())
-                .storeCount(findUser.getStoreCount())
-                .createdAt(findUser.getCreatedAt())
-                .updatedAt(findUser.getUpdatedAt())
+                .id(savedUser.getId())
+                .username(savedUser.getUsername())
+                .userAddress(savedUser.getUserAddress())
+                .userRole(savedUser.getUserRole())
+                .storeCount(savedUser.getStoreCount())
+                .createdAt(savedUser.getCreatedAt())
+                .updatedAt(savedUser.getUpdatedAt())
                 .build();
     }
 
