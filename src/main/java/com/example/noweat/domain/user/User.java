@@ -39,4 +39,17 @@ public class User extends BaseEntity {
         this.userRole = userRole;
         this.isDeleted = isDeleted;
     }
+
+    public void updateUserNameAndAddress(String username, String userAddress) {
+        this.username = username;
+        this.userAddress = userAddress;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void deleteUser(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
 }
