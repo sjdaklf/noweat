@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class UserSingoutRequestDto {
+public class UserSignoutRequestDto {
     @NotBlank(message = "DeviceId는 필수 값 입니다.")
     private String deviceId;
 }

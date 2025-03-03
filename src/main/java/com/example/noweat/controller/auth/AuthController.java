@@ -1,18 +1,14 @@
 package com.example.noweat.controller.auth;
 
-import com.example.noweat.domain.user.UserRole;
 import com.example.noweat.dto.auth.reponse.RefreshTokenResponseDto;
 import com.example.noweat.dto.auth.reponse.UserSigninResponseDto;
 import com.example.noweat.dto.auth.reponse.UserSignupResponseDto;
 import com.example.noweat.dto.auth.request.RefreshTokenRequestDto;
 import com.example.noweat.dto.auth.request.UserSigninRequestDto;
 import com.example.noweat.dto.auth.request.UserSignupRequestDto;
-import com.example.noweat.dto.auth.request.UserSingoutRequestDto;
+import com.example.noweat.dto.auth.request.UserSignoutRequestDto;
 import com.example.noweat.global.argumentResolver.AuthUser;
 import com.example.noweat.service.auth.AuthService;
-import com.example.noweat.service.exception.BadRequestException;
-import com.example.noweat.service.exception.enums.ErrorCode;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidatorFactory;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +39,8 @@ public class AuthController {
     }
 
     @PostMapping("/signout")
-    public void signoutUser(AuthUser authUser, @Valid @RequestBody UserSingoutRequestDto userSingoutRequestDto){
-        authService.signout(authUser.getId(), userSingoutRequestDto.getDeviceId());
+    public void signoutUser(AuthUser authUser, @Valid @RequestBody UserSignoutRequestDto userSignoutRequestDto){
+        authService.signout(authUser.getId(), userSignoutRequestDto.getDeviceId());
     }
 
     @PostMapping("/refresh")
