@@ -3,8 +3,10 @@ package com.example.noweat.service.auth;
 import com.example.noweat.domain.auth.RefreshToken;
 import com.example.noweat.domain.user.User;
 import com.example.noweat.domain.user.UserRole;
+import com.example.noweat.dto.auth.reponse.RefreshTokenResponseDto;
 import com.example.noweat.dto.auth.reponse.UserSigninResponseDto;
 import com.example.noweat.dto.auth.reponse.UserSignupResponseDto;
+import com.example.noweat.dto.auth.request.RefreshTokenRequestDto;
 import com.example.noweat.dto.auth.request.UserSigninRequestDto;
 import com.example.noweat.dto.auth.request.UserSignupRequestDto;
 import com.example.noweat.global.config.PasswordEncoder;
@@ -15,6 +17,8 @@ import com.example.noweat.service.exception.ConflictException;
 import com.example.noweat.service.exception.NotFoundException;
 import com.example.noweat.service.exception.UnauthorizedException;
 import com.example.noweat.service.exception.enums.ErrorCode;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -218,6 +222,68 @@ class AuthServiceTest {
         verify(refreshTokenRepository, times(1)).deleteByUser_IdAndDeviceId(any(), any());
         verify(jwtUtil, times(1)).createAccessToken(any(), any(), any());
         verify(jwtUtil, times(1)).createRefreshToken(any(), any(), any());
+        verify(refreshTokenRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("로그아웃 테스트 작성")
+    void signoutTest(){
+        // given
+        doNothing().when(refreshTokenRepository).deleteByUser_IdAndDeviceId(any(), any());
+
+        // when
+        authService.signout(any(), any());
+
+        // then
+        verify(refreshTokenRepository, times(1)).deleteByUser_IdAndDeviceId(any(), any());
+    }
+
+    @Test
+    @DisplayName("토큰 재발급시 db에 존재하지 않는 토큰이면 예외처리")
+    void notFoundRefreshTokenTest(){
+        // given
+        RefreshTokenRequestDto refreshTokenRequestDto = new RefreshTokenRequestDto();
+
+        Claims claims = Jwts.claims();
+
+        when(jwtUtil.getRefreshTokenClaims(any())).thenReturn(claims);
+        when(refreshTokenRepository.findByRefreshToken(any())).thenReturn(Optional.empty());
+
+        // when, then
+        assertThatThrownBy(() -> authService.refreshToken(refreshTokenRequestDto)).isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("토큰 재발급시 db에 존재하는 토큰이면 정상 진행")
+    void foundRefreshTokenTest(){
+        // given
+        RefreshTokenRequestDto refreshTokenRequestDto = new RefreshTokenRequestDto();
+        RefreshToken refreshToken = new RefreshToken();
+
+        Claims claims = Jwts.claims();
+        claims.setSubject("1");
+        claims.put("email", "이메일");
+        claims.put("userRole", UserRole.USER.name());
+
+        when(jwtUtil.getRefreshTokenClaims(any())).thenReturn(claims);
+        when(refreshTokenRepository.findByRefreshToken(any())).thenReturn(Optional.of(refreshToken));
+        when(jwtUtil.createAccessToken(any(), any(), any())).thenReturn("accessToken");
+        when(jwtUtil.createRefreshToken(any(), any(), any())).thenReturn("refreshToken");
+        doNothing().when(refreshTokenRepository).deleteById(any());
+        when(refreshTokenRepository.save(any())).thenReturn(any());
+
+        // when
+        RefreshTokenResponseDto responseDto = authService.refreshToken(refreshTokenRequestDto);
+
+        // then
+        assertThat(responseDto.getAccessToken()).isEqualTo("accessToken");
+        assertThat(responseDto.getRefreshToken()).isEqualTo("refreshToken");
+
+        verify(jwtUtil, times(1)).getRefreshTokenClaims(any());
+        verify(refreshTokenRepository, times(1)).findByRefreshToken(any());
+        verify(jwtUtil, times(1)).createAccessToken(any(), any(), any());
+        verify(jwtUtil, times(1)).createRefreshToken(any(), any(), any());
+        verify(refreshTokenRepository, times(1)).deleteById(any());
         verify(refreshTokenRepository, times(1)).save(any());
     }
 }
