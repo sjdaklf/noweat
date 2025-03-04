@@ -13,10 +13,7 @@ import com.example.noweat.global.config.PasswordEncoder;
 import com.example.noweat.global.jwt.JwtUtil;
 import com.example.noweat.repository.auth.RefreshTokenRepository;
 import com.example.noweat.repository.user.UserRepository;
-import com.example.noweat.service.exception.BadRequestException;
-import com.example.noweat.service.exception.ConflictException;
-import com.example.noweat.service.exception.NotFoundException;
-import com.example.noweat.service.exception.UnauthorizedException;
+import com.example.noweat.service.exception.*;
 import com.example.noweat.service.exception.enums.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -68,6 +65,10 @@ public class AuthService {
     public UserSigninResponseDto signinUser(UserSigninRequestDto userSigninRequestDto){
 
         User findUser = userRepository.findByEmail(userSigninRequestDto.getEmail()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
+
+        if(findUser.isDeleted()){
+            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
+        }
 
         if(!passwordEncoder.matches(userSigninRequestDto.getPassword(), findUser.getPassword())){
             throw new UnauthorizedException(ErrorCode.INVALID_PASSWORD);
