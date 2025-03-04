@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 public class UserUpdatePasswordResponseDto extends UserResponseDto {
 
-    public UserUpdatePasswordResponseDto(Long id, String username, String userAddress, UserRole userRole, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        super(id, username, userAddress, userRole, createdAt, updatedAt);
+    public UserUpdatePasswordResponseDto(Long id, String name, String address, UserRole userRole, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        super(id, name, address, userRole, createdAt, updatedAt);
     }
 }

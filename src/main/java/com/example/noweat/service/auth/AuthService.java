@@ -16,9 +16,7 @@ import com.example.noweat.repository.user.UserRepository;
 import com.example.noweat.service.exception.*;
 import com.example.noweat.service.exception.enums.ErrorCode;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,8 +42,8 @@ public class AuthService {
         User user = User.builder()
                 .email(userSignupRequestDto.getEmail())
                 .password(encodedPassword)
-                .userAddress(userSignupRequestDto.getUserAddress())
-                .username(userSignupRequestDto.getUsername())
+                .address(userSignupRequestDto.getAddress())
+                .name(userSignupRequestDto.getName())
                 .userRole(userRole)
                 .storeCount(0L)
                 .isDeleted(false)
@@ -55,7 +53,7 @@ public class AuthService {
 
         return UserSignupResponseDto.builder()
                 .id(saveUser.getId())
-                .username(saveUser.getUsername())
+                .name(saveUser.getName())
                 .userRole(saveUser.getUserRole())
                 .createdAt(saveUser.getCreatedAt())
                 .build();

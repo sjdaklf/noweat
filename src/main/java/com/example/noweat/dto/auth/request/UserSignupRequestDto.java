@@ -18,10 +18,10 @@ public class UserSignupRequestDto {
     private String password;
 
     @NotBlank(message = "유저 주소는 필수 값 입니다.")
-    private String userAddress;
+    private String address;
 
     @NotBlank(message = "유저이름은 필수 값 입니다.")
-    private String username;
+    private String name;
 
     @NotBlank(message = "유저 역할은 필수 값 입니다.")
     private String userRole;
