@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public abstract class UserResponseDto<T extends UserResponseDto<T>> {
+public class UserResponseDto {
     private Long id;
     private String username;
     private String userAddress;
