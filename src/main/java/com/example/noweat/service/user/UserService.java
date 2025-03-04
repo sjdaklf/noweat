@@ -40,25 +40,27 @@ public class UserService {
         verifyUser(findUser);
 
         if (findUser.getUserRole() != UserRole.OWNER) {
-            return UserFindResponseDto.builder()
-                    .id(findUser.getId())
-                    .username(findUser.getUsername())
-                    .userAddress(findUser.getUserAddress())
-                    .userRole(findUser.getUserRole())
-                    .createdAt(findUser.getCreatedAt())
-                    .updatedAt(findUser.getUpdatedAt())
-                    .build();
+
+            return new UserFindResponseDto(
+                    findUser.getId(),
+                    findUser.getUsername(),
+                    findUser.getUserAddress(),
+                    findUser.getUserRole(),
+                    findUser.getCreatedAt(),
+                    findUser.getUpdatedAt()
+            );
         }
 
-        return UserOwnerFindResponseDto.builder()
-                .id(findUser.getId())
-                .username(findUser.getUsername())
-                .userAddress(findUser.getUserAddress())
-                .userRole(findUser.getUserRole())
-                .storeCount(findUser.getStoreCount())
-                .createdAt(findUser.getCreatedAt())
-                .updatedAt(findUser.getUpdatedAt())
-                .build();
+        return new UserOwnerFindResponseDto(
+                findUser.getId(),
+                findUser.getUsername(),
+                findUser.getUserAddress(),
+                findUser.getUserRole(),
+                findUser.getStoreCount(),
+                findUser.getCreatedAt(),
+                findUser.getUpdatedAt()
+        );
+
     }
 
     @Transactional(readOnly = true)
@@ -131,25 +133,28 @@ public class UserService {
         User savedUser = userRepository.save(findUser);
 
         if (savedUser.getUserRole() != UserRole.OWNER) {
-            return UserUpdateNameAndAddressResponseDto.builder()
-                    .id(savedUser.getId())
-                    .username(savedUser.getUsername())
-                    .userAddress(savedUser.getUserAddress())
-                    .userRole(savedUser.getUserRole())
-                    .createdAt(savedUser.getCreatedAt())
-                    .updatedAt(savedUser.getUpdatedAt())
-                    .build();
+
+            return new UserUpdateNameAndAddressResponseDto(
+                    findUser.getId(),
+                    findUser.getUsername(),
+                    findUser.getUserAddress(),
+                    findUser.getUserRole(),
+                    findUser.getCreatedAt(),
+                    findUser.getUpdatedAt()
+            );
+
         }
 
-        return UserOwnerUpdateNameAndAddressResponseDto.builder()
-                .id(savedUser.getId())
-                .username(savedUser.getUsername())
-                .userAddress(savedUser.getUserAddress())
-                .userRole(savedUser.getUserRole())
-                .storeCount(savedUser.getStoreCount())
-                .createdAt(savedUser.getCreatedAt())
-                .updatedAt(savedUser.getUpdatedAt())
-                .build();
+        return new UserOwnerUpdateNameAndAddressResponseDto(
+                findUser.getId(),
+                findUser.getUsername(),
+                findUser.getUserAddress(),
+                findUser.getUserRole(),
+                savedUser.getStoreCount(),
+                findUser.getCreatedAt(),
+                findUser.getUpdatedAt()
+        );
+
     }
 
     public UserResponseDto updateUserPassword(AuthUser authUser, UserUpdatePasswordRequestDto userUpdatePasswordRequestDto) {
@@ -171,25 +176,28 @@ public class UserService {
         User savedUser = userRepository.save(findUser);
 
         if (savedUser.getUserRole() != UserRole.OWNER) {
-            return UserUpdatePasswordResponseDto.builder()
-                    .id(savedUser.getId())
-                    .username(savedUser.getUsername())
-                    .userAddress(savedUser.getUserAddress())
-                    .userRole(savedUser.getUserRole())
-                    .createdAt(savedUser.getCreatedAt())
-                    .updatedAt(savedUser.getUpdatedAt())
-                    .build();
+
+            return new UserUpdatePasswordResponseDto(
+                    findUser.getId(),
+                    findUser.getUsername(),
+                    findUser.getUserAddress(),
+                    findUser.getUserRole(),
+                    findUser.getCreatedAt(),
+                    findUser.getUpdatedAt()
+            );
+
         }
 
-        return UserOwnerUpdatePasswordResponseDto.builder()
-                .id(savedUser.getId())
-                .username(savedUser.getUsername())
-                .userAddress(savedUser.getUserAddress())
-                .userRole(savedUser.getUserRole())
-                .storeCount(savedUser.getStoreCount())
-                .createdAt(savedUser.getCreatedAt())
-                .updatedAt(savedUser.getUpdatedAt())
-                .build();
+        return new UserOwnerUpdatePasswordResponseDto(
+                findUser.getId(),
+                findUser.getUsername(),
+                findUser.getUserAddress(),
+                findUser.getUserRole(),
+                savedUser.getStoreCount(),
+                findUser.getCreatedAt(),
+                findUser.getUpdatedAt()
+        );
+
     }
 
     @Transactional

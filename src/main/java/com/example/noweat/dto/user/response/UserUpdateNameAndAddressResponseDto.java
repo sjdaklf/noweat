@@ -6,9 +6,8 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class UserUpdateNameAndAddressResponseDto extends UserResponseDto<UserUpdateNameAndAddressResponseDto> {
+public class UserUpdateNameAndAddressResponseDto extends UserResponseDto {
 
-    @Builder
     public UserUpdateNameAndAddressResponseDto(Long id, String username, String userAddress, UserRole userRole, LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(id, username, userAddress, userRole, createdAt, updatedAt);
     }

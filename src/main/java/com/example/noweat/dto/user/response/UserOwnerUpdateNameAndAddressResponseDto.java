@@ -7,10 +7,9 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class UserOwnerUpdateNameAndAddressResponseDto extends UserResponseDto<UserOwnerUpdateNameAndAddressResponseDto> {
+public class UserOwnerUpdateNameAndAddressResponseDto extends UserResponseDto {
     private Long storeCount;
 
-    @Builder
     public UserOwnerUpdateNameAndAddressResponseDto(Long id, String username, String userAddress, UserRole userRole, Long storeCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(id, username, userAddress, userRole, createdAt, updatedAt);
         this.storeCount = storeCount;
