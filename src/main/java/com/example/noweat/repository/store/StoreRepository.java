@@ -10,4 +10,10 @@ import java.util.List;
 public interface StoreRepository extends JpaRepository<Store, Long> {
     @Query ("SELECT s FROM Store s WHERE s.user.id = :userId AND s.isClosed = false")
     List<Store> findStoresByUserId(@Param("userId") Long userId);
+
+    @Query ("SELECT s FROM Store s WHERE s.storeName LIKE %:storeName% AND s.isClosed = false")
+    List<Store> findByStoreNameContaining(@Param("storeName") String storeName);
+
+    @Query ("SELECT s FROM Store s WHERE s.isClosed = false")
+    List<Store> findAllStore();
 }

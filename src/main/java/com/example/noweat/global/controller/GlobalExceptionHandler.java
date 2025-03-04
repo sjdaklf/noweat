@@ -47,6 +47,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
+    public ResponseEntity<Map<String, Object>> handleGoneException(GoneException ex){
+        Map<String, Object> responseMap = createResponseMap(ex.getErrorCode());
+        return new ResponseEntity<>(responseMap, ex.getErrorCode().getHttpStatus());
+    }
+
+    @ExceptionHandler
     public ResponseEntity<Map<String, Object>> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException ex){
         Map<String, Object> responseMap = new HashMap<>();
 
