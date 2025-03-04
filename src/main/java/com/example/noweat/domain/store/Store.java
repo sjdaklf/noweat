@@ -3,6 +3,7 @@ package com.example.noweat.domain.store;
 import com.example.noweat.domain.common.entity.BaseEntity;
 import com.example.noweat.domain.user.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,7 +40,6 @@ public class Store extends BaseEntity {
     private boolean isClosed;
 
     @Builder
-
     public Store(User user, String storeName, String storeAddress, StoreCategory storeCategory, Long minOrderPrice, Double averageRating, LocalTime openTime, LocalTime closedTime, boolean isClosed) {
         this.user = user;
         this.storeName = storeName;
@@ -49,6 +49,19 @@ public class Store extends BaseEntity {
         this.averageRating = averageRating;
         this.openTime = openTime;
         this.closedTime = closedTime;
+        this.isClosed = isClosed;
+    }
+
+    public void updateStore(String storeName, String storeAddress, StoreCategory storeCategory, Long minOrderPrice, LocalTime openTime, LocalTime closedTime) {
+        this.storeName = storeName;
+        this.storeAddress = storeAddress;
+        this.storeCategory = storeCategory;
+        this.minOrderPrice = minOrderPrice;
+        this.openTime = openTime;
+        this.closedTime = closedTime;
+    }
+
+    public void deleteStore(boolean isClosed) {
         this.isClosed = isClosed;
     }
 }

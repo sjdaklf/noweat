@@ -20,17 +20,21 @@ public enum ErrorCode {
     NOT_USER("유저 권한을 가지고 있지않습니다.", HttpStatus.UNAUTHORIZED),
     DELETED_USER("탈퇴한 유저입니다.", HttpStatus.UNAUTHORIZED),
 
-
     // 403 에러
 
     // 404 에러
     NOT_FOUND_USER("존재하지 않는 유저입니다.", HttpStatus.NOT_FOUND),
+    STORE_NOT_EXIST("가게를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     NOT_FOUND_REFRESH_TOKEN("존재하지 않는 RefreshToken 입니다.", HttpStatus.NOT_FOUND),
 
     //409 에러
     EMAIL_ALREADY_EXISTS("사용할 수 없는 이메일입니다.", HttpStatus.CONFLICT),
     USER_ALREADY_LOGGED_IN("이미 로그인된 사용자입니다.", HttpStatus.CONFLICT),
-    SAME_AS_PREVIOUS_PASSWORD("새 비밀번호는 기존 비밀번호와 같을 수 없습니다.", HttpStatus.CONFLICT);
+    SAME_AS_PREVIOUS_PASSWORD("새 비밀번호는 기존 비밀번호와 같을 수 없습니다.", HttpStatus.CONFLICT),
+    MAX_STORE_LIMIT_EXCEEDED("가게를 최대 3개까지만 운영할 수 있습니다.", HttpStatus.CONFLICT),
+
+    //410 에러
+    STORE_CLOSED("폐업된 가게입니다.", HttpStatus.GONE);
 
     private String message;
     private HttpStatus httpStatus;

@@ -52,4 +52,13 @@ public class User extends BaseEntity {
     public void deleteUser(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
+
+    public void increaseStoreCount() {
+        this.storeCount += 1;
+    }
+
+    public void decreaseStoreCount() {
+            this.storeCount -= 1;
+    }
+
 }
