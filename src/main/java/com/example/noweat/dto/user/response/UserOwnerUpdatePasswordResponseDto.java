@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 public class UserOwnerUpdatePasswordResponseDto extends UserResponseDto {
     private Long storeCount;
 
-    public UserOwnerUpdatePasswordResponseDto(Long id, String username, String userAddress, UserRole userRole, Long storeCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        super(id, username, userAddress, userRole, createdAt, updatedAt);
+    public UserOwnerUpdatePasswordResponseDto(Long id, String name, String address, UserRole userRole, Long storeCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        super(id, name, address, userRole, createdAt, updatedAt);
         this.storeCount = storeCount;
     }
 }

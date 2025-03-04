@@ -18,9 +18,9 @@ public class User extends BaseEntity {
 
     private String password;
 
-    private String userAddress;
+    private String address;
 
-    private String username;
+    private String name;
 
     private Long storeCount;
 
@@ -30,19 +30,19 @@ public class User extends BaseEntity {
     private boolean isDeleted;
 
     @Builder
-    public User(String email, String password, String userAddress, String username, Long storeCount, UserRole userRole, boolean isDeleted) {
+    public User(String email, String password, String address, String name, Long storeCount, UserRole userRole, boolean isDeleted) {
         this.email = email;
         this.password = password;
-        this.userAddress = userAddress;
-        this.username = username;
+        this.address = address;
+        this.name = name;
         this.storeCount = storeCount;
         this.userRole = userRole;
         this.isDeleted = isDeleted;
     }
 
-    public void updateUserNameAndAddress(String username, String userAddress) {
-        this.username = username;
-        this.userAddress = userAddress;
+    public void updateUserNameAndAddress(String name, String address) {
+        this.name = name;
+        this.address = address;
     }
 
     public void updatePassword(String password) {

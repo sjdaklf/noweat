@@ -59,8 +59,8 @@ class AuthServiceTest {
         UserSignupRequestDto requestDto = new UserSignupRequestDto();
         ReflectionTestUtils.setField(requestDto, "email", "scie429@gmail.com");
         ReflectionTestUtils.setField(requestDto, "password", "1234");
-        ReflectionTestUtils.setField(requestDto, "userAddress", "주소");
-        ReflectionTestUtils.setField(requestDto, "username", "tgg");
+        ReflectionTestUtils.setField(requestDto, "address", "주소");
+        ReflectionTestUtils.setField(requestDto, "name", "tgg");
         ReflectionTestUtils.setField(requestDto, "userRole", "USER");
 
         when(userRepository.existsByEmail(any())).thenReturn(false);
@@ -69,8 +69,8 @@ class AuthServiceTest {
         User savedUser = User.builder()
                 .email(requestDto.getEmail())
                 .password("encodedPassword")
-                .username(requestDto.getUsername())
-                .userAddress(requestDto.getUserAddress())
+                .name(requestDto.getName())
+                .address(requestDto.getAddress())
                 .userRole(UserRole.USER)
                 .storeCount(0L)
                 .isDeleted(false)
@@ -88,7 +88,7 @@ class AuthServiceTest {
 
         //then
         assertThat(responseDto.getId()).isEqualTo(savedUser.getId());
-        assertThat(responseDto.getUsername()).isEqualTo(savedUser.getUsername());
+        assertThat(responseDto.getName()).isEqualTo(savedUser.getName());
         assertThat(responseDto.getUserRole()).isEqualTo(UserRole.USER);
         assertThat(responseDto.getCreatedAt()).isEqualTo(localDateTime);
 
@@ -104,8 +104,8 @@ class AuthServiceTest {
         UserSignupRequestDto requestDto = new UserSignupRequestDto();
         ReflectionTestUtils.setField(requestDto, "email", "scie429@gmail.com");
         ReflectionTestUtils.setField(requestDto, "password", "1234");
-        ReflectionTestUtils.setField(requestDto, "userAddress", "주소");
-        ReflectionTestUtils.setField(requestDto, "username", "tgg");
+        ReflectionTestUtils.setField(requestDto, "address", "주소");
+        ReflectionTestUtils.setField(requestDto, "name", "tgg");
         ReflectionTestUtils.setField(requestDto, "userRole", "USER");
 
         when(userRepository.existsByEmail(any())).thenReturn(true);

@@ -50,7 +50,7 @@ class AuthControllerTest {
 
         UserSignupResponseDto responseDto = UserSignupResponseDto.builder()
                 .id(1L)
-                .username("김민재")
+                .name("김민재")
                 .userRole(UserRole.USER)
                 .createdAt(localDateTime)
                 .build();
@@ -62,12 +62,12 @@ class AuthControllerTest {
                         .characterEncoding("UTF-8")
                         .content("{\"email\" : \"scie429@gmail.com\"," +
                                 " \"password\" : \"Sukim2919@\"," +
-                                " \"userAddress\" : \"전남 신안군\"," +
-                                " \"username\" : \"username\"," +
+                                " \"address\" : \"전남 신안군\"," +
+                                " \"name\" : \"username\"," +
                                 " \"userRole\" : \"USER\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(responseDto.getId()))
-                .andExpect(jsonPath("$.username").value("김민재"))
+                .andExpect(jsonPath("$.name").value("김민재"))
                 .andExpect(jsonPath("$.userRole").value("USER"))
                 .andExpect(jsonPath("$.createdAt").value(dateTimeFormatter.format(localDateTime)));
     }

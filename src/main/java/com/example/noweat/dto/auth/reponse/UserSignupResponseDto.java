@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class UserSignupResponseDto {
     private final Long id;
 
-    private final String username;
+    private final String name;
 
     private final UserRole userRole;
 
@@ -19,9 +19,9 @@ public class UserSignupResponseDto {
     private final LocalDateTime createdAt;
 
     @Builder
-    public UserSignupResponseDto(Long id, String username, UserRole userRole, LocalDateTime createdAt){
+    public UserSignupResponseDto(Long id, String name, UserRole userRole, LocalDateTime createdAt){
         this.id = id;
-        this.username = username;
+        this.name = name;
         this.userRole = userRole;
         this.createdAt = createdAt;
     }

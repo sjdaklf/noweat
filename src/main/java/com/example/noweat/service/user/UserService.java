@@ -45,8 +45,8 @@ public class UserService {
 
             return new UserFindResponseDto(
                     findUser.getId(),
-                    findUser.getUsername(),
-                    findUser.getUserAddress(),
+                    findUser.getName(),
+                    findUser.getAddress(),
                     findUser.getUserRole(),
                     findUser.getCreatedAt(),
                     findUser.getUpdatedAt()
@@ -55,8 +55,8 @@ public class UserService {
 
         return new UserOwnerFindResponseDto(
                 findUser.getId(),
-                findUser.getUsername(),
-                findUser.getUserAddress(),
+                findUser.getName(),
+                findUser.getAddress(),
                 findUser.getUserRole(),
                 findUser.getStoreCount(),
                 findUser.getCreatedAt(),
@@ -138,8 +138,8 @@ public class UserService {
 
             return new UserUpdateNameAndAddressResponseDto(
                     findUser.getId(),
-                    findUser.getUsername(),
-                    findUser.getUserAddress(),
+                    findUser.getName(),
+                    findUser.getAddress(),
                     findUser.getUserRole(),
                     findUser.getCreatedAt(),
                     findUser.getUpdatedAt()
@@ -149,8 +149,8 @@ public class UserService {
 
         return new UserOwnerUpdateNameAndAddressResponseDto(
                 findUser.getId(),
-                findUser.getUsername(),
-                findUser.getUserAddress(),
+                findUser.getName(),
+                findUser.getAddress(),
                 findUser.getUserRole(),
                 savedUser.getStoreCount(),
                 findUser.getCreatedAt(),
@@ -181,8 +181,8 @@ public class UserService {
 
             return new UserUpdatePasswordResponseDto(
                     findUser.getId(),
-                    findUser.getUsername(),
-                    findUser.getUserAddress(),
+                    findUser.getName(),
+                    findUser.getAddress(),
                     findUser.getUserRole(),
                     findUser.getCreatedAt(),
                     findUser.getUpdatedAt()
@@ -192,8 +192,8 @@ public class UserService {
 
         return new UserOwnerUpdatePasswordResponseDto(
                 findUser.getId(),
-                findUser.getUsername(),
-                findUser.getUserAddress(),
+                findUser.getName(),
+                findUser.getAddress(),
                 findUser.getUserRole(),
                 savedUser.getStoreCount(),
                 findUser.getCreatedAt(),
