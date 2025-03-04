@@ -26,8 +26,6 @@ public enum ErrorCode {
     // 404 에러
     NOT_FOUND_USER("존재하지 않는 유저입니다.", HttpStatus.NOT_FOUND),
     NOT_FOUND_REFRESH_TOKEN("존재하지 않는 RefreshToken 입니다.", HttpStatus.NOT_FOUND),
-    NOT_FOUND_STORE("존재하지 않는 가게입니다.", HttpStatus.NOT_FOUND),
-    NOT_FOUND_REVIEW("존재하지 않는 리뷰입니다.", HttpStatus.NOT_FOUND),
 
     //409 에러
     EMAIL_ALREADY_EXISTS("사용할 수 없는 이메일입니다.", HttpStatus.CONFLICT),

@@ -6,23 +6,10 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class UserUpdatePasswordResponseDto {
-    private final Long id;
-    private final String username;
-    private final String userAddress;
-    private final UserRole userRole;
-    private final Long storeCount;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+public class UserUpdatePasswordResponseDto extends UserResponseDto<UserOwnerUpdatePasswordResponseDto> {
 
     @Builder
-    public UserUpdatePasswordResponseDto(Long id, String username, String userAddress, UserRole userRole, Long storeCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.username = username;
-        this.userAddress = userAddress;
-        this.userRole = userRole;
-        this.storeCount = storeCount;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+    public UserUpdatePasswordResponseDto(Long id, String username, String userAddress, UserRole userRole, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        super(id, username, userAddress, userRole, createdAt, updatedAt);
     }
 }
