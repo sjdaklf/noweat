@@ -38,21 +38,21 @@ public class UserController {
     }
 
     @PatchMapping("/users")
-    public ResponseEntity<UserUpdateNameAndAddressResponseDto> updateUserNameAndAddress(
+    public ResponseEntity<UserResponseDto> updateUserNameAndAddress(
             AuthUser authUser,
             @Valid @RequestBody UserUpdateNameAndAddressRequestDto userUpdateNameAndAddressRequestDto
     ) {
-        UserUpdateNameAndAddressResponseDto userUpdateNameAndAddressResponseDto = userService.updateUserNameAndAddress(authUser, userUpdateNameAndAddressRequestDto);
-        return ResponseEntity.ok(userUpdateNameAndAddressResponseDto);
+        UserResponseDto userResponseDto = userService.updateUserNameAndAddress(authUser, userUpdateNameAndAddressRequestDto);
+        return ResponseEntity.ok(userResponseDto);
     }
 
     @PatchMapping("/users/password")
-    public ResponseEntity<UserUpdatePasswordResponseDto> updateUserPassword(
+    public ResponseEntity<UserResponseDto> updateUserPassword(
             AuthUser authUser,
             @Valid @RequestBody UserUpdatePasswordRequestDto userUpdatePasswordRequestDto
     ) {
-        UserUpdatePasswordResponseDto userUpdatePasswordResponseDto = userService.updateUserPassword(authUser, userUpdatePasswordRequestDto);
-        return ResponseEntity.ok(userUpdatePasswordResponseDto);
+        UserResponseDto userResponseDto = userService.updateUserPassword(authUser, userUpdatePasswordRequestDto);
+        return ResponseEntity.ok(userResponseDto);
     }
 
     @PostMapping("/users")

@@ -39,7 +39,18 @@ public class UserService {
 
         verifyUser(findUser);
 
-        return UserResponseDto.builder()
+        if (findUser.getUserRole() != UserRole.OWNER) {
+            return UserFindResponseDto.builder()
+                    .id(findUser.getId())
+                    .username(findUser.getUsername())
+                    .userAddress(findUser.getUserAddress())
+                    .userRole(findUser.getUserRole())
+                    .createdAt(findUser.getCreatedAt())
+                    .updatedAt(findUser.getUpdatedAt())
+                    .build();
+        }
+
+        return UserOwnerFindResponseDto.builder()
                 .id(findUser.getId())
                 .username(findUser.getUsername())
                 .userAddress(findUser.getUserAddress())
@@ -63,7 +74,7 @@ public class UserService {
 
         List<Store> findStores = storeRepository.findStoresByUserId(findUser.getId());
 
-        List<UserStoreResponseDto> storeList= new ArrayList<>();
+        List<UserStoreResponseDto> storeList = new ArrayList<>();
         for (Store store : findStores) {
             UserStoreResponseDto userStoreResponseDto = new UserStoreResponseDto(
                     store.getId(),
@@ -92,7 +103,7 @@ public class UserService {
 
         List<Review> findReviews = reviewRepository.findReviewsByUserId(findUser.getId());
 
-        List<UserReviewResponseDto> reviewList= new ArrayList<>();
+        List<UserReviewResponseDto> reviewList = new ArrayList<>();
         for (Review review : findReviews) {
             UserReviewResponseDto userReviewResponseDto = new UserReviewResponseDto(
                     review.getId(),
@@ -109,7 +120,7 @@ public class UserService {
         return reviewList;
     }
 
-    public UserUpdateNameAndAddressResponseDto updateUserNameAndAddress(AuthUser authUser, UserUpdateNameAndAddressRequestDto userUpdateNameAndAddressRequestDto) {
+    public UserResponseDto updateUserNameAndAddress(AuthUser authUser, UserUpdateNameAndAddressRequestDto userUpdateNameAndAddressRequestDto) {
 
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
@@ -119,7 +130,18 @@ public class UserService {
 
         User savedUser = userRepository.save(findUser);
 
-        return UserUpdateNameAndAddressResponseDto.builder()
+        if (savedUser.getUserRole() != UserRole.OWNER) {
+            return UserUpdateNameAndAddressResponseDto.builder()
+                    .id(savedUser.getId())
+                    .username(savedUser.getUsername())
+                    .userAddress(savedUser.getUserAddress())
+                    .userRole(savedUser.getUserRole())
+                    .createdAt(savedUser.getCreatedAt())
+                    .updatedAt(savedUser.getUpdatedAt())
+                    .build();
+        }
+
+        return UserOwnerUpdateNameAndAddressResponseDto.builder()
                 .id(savedUser.getId())
                 .username(savedUser.getUsername())
                 .userAddress(savedUser.getUserAddress())
@@ -130,7 +152,7 @@ public class UserService {
                 .build();
     }
 
-    public UserUpdatePasswordResponseDto updateUserPassword(AuthUser authUser, UserUpdatePasswordRequestDto userUpdatePasswordRequestDto) {
+    public UserResponseDto updateUserPassword(AuthUser authUser, UserUpdatePasswordRequestDto userUpdatePasswordRequestDto) {
 
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
@@ -148,7 +170,18 @@ public class UserService {
 
         User savedUser = userRepository.save(findUser);
 
-        return UserUpdatePasswordResponseDto.builder()
+        if (savedUser.getUserRole() != UserRole.OWNER) {
+            return UserUpdatePasswordResponseDto.builder()
+                    .id(savedUser.getId())
+                    .username(savedUser.getUsername())
+                    .userAddress(savedUser.getUserAddress())
+                    .userRole(savedUser.getUserRole())
+                    .createdAt(savedUser.getCreatedAt())
+                    .updatedAt(savedUser.getUpdatedAt())
+                    .build();
+        }
+
+        return UserOwnerUpdatePasswordResponseDto.builder()
                 .id(savedUser.getId())
                 .username(savedUser.getUsername())
                 .userAddress(savedUser.getUserAddress())
