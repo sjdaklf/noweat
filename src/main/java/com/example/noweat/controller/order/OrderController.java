@@ -1,6 +1,7 @@
 package com.example.noweat.controller.order;
 
 import com.example.noweat.dto.order.reponse.OrderCreateResponseDto;
+import com.example.noweat.dto.order.reponse.OrderOwnerResponseDto;
 import com.example.noweat.dto.order.reponse.OrderStatusUpdateResponseDto;
 import com.example.noweat.dto.order.reponse.OrderUserResponseDto;
 import com.example.noweat.dto.order.request.OrderStatusUpdateRequestDto;
@@ -32,9 +33,14 @@ public class OrderController {
         return new ResponseEntity<>(orderStatusUpdateResponseDto, HttpStatus.OK);
     }
 
-    @GetMapping("/orders")
+    @GetMapping("/users/orders")
     public ResponseEntity<List<OrderUserResponseDto>> findUsersAllOrders(AuthUser authUser){
         return new ResponseEntity<>(orderService.findUsersAllOrders(authUser), HttpStatus.OK);
+    }
+
+    @GetMapping("/owners/orders")
+    public ResponseEntity<List<OrderOwnerResponseDto>> findOwnersAllOrders(AuthUser authUser){
+        return new ResponseEntity<>(orderService.findOwnersAllOrders(authUser), HttpStatus.OK);
     }
 
     @DeleteMapping("/orders/{orderId}/users")

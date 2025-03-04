@@ -7,6 +7,7 @@ import com.example.noweat.domain.store.Store;
 import com.example.noweat.domain.user.User;
 import com.example.noweat.domain.user.UserRole;
 import com.example.noweat.dto.order.reponse.OrderCreateResponseDto;
+import com.example.noweat.dto.order.reponse.OrderOwnerResponseDto;
 import com.example.noweat.dto.order.reponse.OrderUserResponseDto;
 import com.example.noweat.dto.order.reponse.OrderStatusUpdateResponseDto;
 import com.example.noweat.dto.order.request.OrderStatusUpdateRequestDto;
@@ -123,15 +124,38 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public List<OrderUserResponseDto> findUsersAllOrders(AuthUser authUser){
-        // 유저만 주문한 목록을 볼 수 있음
+        // 유저의 주문한 목록을 볼 수 있음
         if(authUser.getUserRole() != UserRole.USER){
             throw new ForbiddenException(ErrorCode.NOT_USER);
         }
 
+        // 유저의 id로 주문 목록 찾기
         List<Order> orders = orderRepository.findByUser_Id(authUser.getId());
 
         return orders.stream().map(order -> OrderUserResponseDto.builder()
                 .id(order.getId())
+                .orderStatus(order.getOrderStatus())
+                .storeName(order.getStore().getStoreName())
+                .menuName(order.getMenuName())
+                .menuPrice(order.getMenuPrice())
+                .createdAt(order.getCreatedAt())
+                .build())
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderOwnerResponseDto> findOwnersAllOrders(AuthUser authUser){
+        // 유저의 주문한 목록을 볼 수 있음
+        if(authUser.getUserRole() != UserRole.OWNER){
+            throw new ForbiddenException(ErrorCode.NOT_OWNER);
+        }
+
+        // 사장의 아이디로 주문 목록 찾기
+        List<Order> orders = orderRepository.findByOwnerUserId(authUser.getId());
+
+        return orders.stream().map(order -> OrderOwnerResponseDto.builder()
+                .id(order.getId())
+                        .orderUserId(order.getUser().getId())
                 .orderStatus(order.getOrderStatus())
                 .storeName(order.getStore().getStoreName())
                 .menuName(order.getMenuName())
