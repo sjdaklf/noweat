@@ -7,6 +7,7 @@ import com.example.noweat.domain.store.Store;
 import com.example.noweat.domain.user.User;
 import com.example.noweat.domain.user.UserRole;
 import com.example.noweat.dto.order.reponse.OrderCreateResponseDto;
+import com.example.noweat.dto.order.reponse.OrderUserResponseDto;
 import com.example.noweat.dto.order.reponse.OrderStatusUpdateResponseDto;
 import com.example.noweat.dto.order.request.OrderStatusUpdateRequestDto;
 import com.example.noweat.global.argumentResolver.AuthUser;
@@ -23,8 +24,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.DateTimeException;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +38,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
 
     @Transactional
-    public OrderCreateResponseDto createOrder(AuthUser authUser, Long storeId, Long menuId){
+    public OrderCreateResponseDto createOrder(AuthUser authUser, Long menuId){
 
         LocalTime currentTime = LocalTime.now();
 
@@ -51,7 +53,8 @@ public class OrderService {
             throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
         }
 
-        Store findStore = storeRepository.findById(storeId).orElseThrow(() -> new NotFoundException(ErrorCode.STORE_NOT_EXIST));
+        Menu findMenu = menuRepository.findById(menuId).orElseThrow(() -> new NotFoundException(ErrorCode.MENU_NOT_EXIST));
+        Store findStore = findMenu.getStore();
 
         // 폐업된 가게면 주문을 생성할 수 없음
         if(findStore.isClosed()){
@@ -62,8 +65,6 @@ public class OrderService {
         if(currentTime.isBefore(findStore.getOpenTime()) || currentTime.isAfter(findStore.getClosedTime())){
             throw new BadRequestException(ErrorCode.STORE_NOT_OPEN);
         }
-
-        Menu findMenu = menuRepository.findById(menuId).orElseThrow(() -> new NotFoundException(ErrorCode.MENU_NOT_EXIST));
 
         // 삭제된 메뉴는 주문할 수 없음
         if(findMenu.isDeleted()){
@@ -118,5 +119,58 @@ public class OrderService {
         return OrderStatusUpdateResponseDto.builder()
                 .orderStatus(findOrder.getOrderStatus())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderUserResponseDto> findUsersAllOrders(AuthUser authUser){
+        // 유저만 주문한 목록을 볼 수 있음
+        if(authUser.getUserRole() != UserRole.USER){
+            throw new ForbiddenException(ErrorCode.NOT_USER);
+        }
+
+        List<Order> orders = orderRepository.findByUser_Id(authUser.getId());
+
+        return orders.stream().map(order -> OrderUserResponseDto.builder()
+                .id(order.getId())
+                .orderStatus(order.getOrderStatus())
+                .storeName(order.getStore().getStoreName())
+                .menuName(order.getMenuName())
+                .menuPrice(order.getMenuPrice())
+                .createdAt(order.getCreatedAt())
+                .build())
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteUsersOrder(AuthUser authUser, Long orderId){
+
+        Order findOrder = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_EXIST));
+
+        if(authUser.getUserRole() != UserRole.USER){
+            throw new ForbiddenException(ErrorCode.NOT_USER);
+        }
+
+        if(authUser.getId() != findOrder.getUser().getId()){
+            throw new ForbiddenException(ErrorCode.NOT_USERS_ORDER);
+        }
+
+        orderRepository.deleteById(orderId);
+    }
+
+    @Transactional
+    public void deleteOwnersOrder(AuthUser authUser, Long orderId){
+
+        Order findOrder = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_EXIST));
+
+        if(authUser.getUserRole() != UserRole.OWNER){
+            throw new ForbiddenException(ErrorCode.NOT_OWNER);
+        }
+
+        if(authUser.getId() != findOrder.getStore().getUser().getId()){
+            throw new ForbiddenException(ErrorCode.NOT_OWNERS_ORDER);
+        }
+
+        orderRepository.deleteById(orderId);
+
     }
 }

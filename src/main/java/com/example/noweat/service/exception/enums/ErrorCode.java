@@ -26,6 +26,8 @@ public enum ErrorCode {
     NOT_OWNER("사장 권한을 가지고 있지않습니다.", HttpStatus.FORBIDDEN),
     NOT_USER("유저 권한을 가지고 있지않습니다.", HttpStatus.FORBIDDEN),
     NOT_STORE_OWNER("사장님의 가게가 아닙니다.", HttpStatus.FORBIDDEN),
+    NOT_USERS_ORDER("유저의 주문이 아닙니다.", HttpStatus.FORBIDDEN),
+    NOT_OWNERS_ORDER("사장님의 주문이 아닙니다.", HttpStatus.FORBIDDEN),
     STORE_NOT_MATCH("권한이 없는 가게입니다.", HttpStatus.FORBIDDEN),
     MENU_NOT_MATCH("권한이 없는 메뉴입니다.", HttpStatus.FORBIDDEN),
 
