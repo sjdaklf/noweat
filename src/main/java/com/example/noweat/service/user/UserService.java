@@ -13,6 +13,7 @@ import com.example.noweat.global.config.PasswordEncoder;
 import com.example.noweat.repository.review.ReviewRepository;
 import com.example.noweat.repository.store.StoreRepository;
 import com.example.noweat.repository.user.UserRepository;
+import com.example.noweat.service.exception.*;
 import com.example.noweat.service.exception.ConflictException;
 import com.example.noweat.service.exception.GoneException;
 import com.example.noweat.service.exception.NotFoundException;
@@ -217,7 +218,7 @@ public class UserService {
 
     public void verifyUser(User findUser) {
         if (findUser.isDeleted()) {
-            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
+            throw new UnauthorizedException(ErrorCode.DELETED_USER);
         }
     }
 }

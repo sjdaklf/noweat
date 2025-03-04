@@ -40,4 +40,8 @@ public class Order extends BaseEntity {
         this.menuName = menuName;
         this.menuPrice = menuPrice;
     }
+
+    public void updateOrderStatus(OrderStatus orderStatus){
+        this.orderStatus = orderStatus;
+    }
 }
