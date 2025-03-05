@@ -50,7 +50,7 @@ public enum ErrorCode {
     ORDER_NOT_EXIST("주문을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     REVIEW_NOT_EXIST("리뷰를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
-    //409 에러
+    // 409 에러
     EMAIL_ALREADY_EXISTS("사용할 수 없는 이메일입니다.", HttpStatus.CONFLICT),
     USER_ALREADY_LOGGED_IN("이미 로그인된 사용자입니다.", HttpStatus.CONFLICT),
     SAME_AS_PREVIOUS_PASSWORD("새 비밀번호는 기존 비밀번호와 같을 수 없습니다.", HttpStatus.CONFLICT),
