@@ -21,9 +21,9 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
 
-    @PostMapping("/menus/{menuId}/orders")
-    public ResponseEntity<OrderCreateResponseDto> createOrder(AuthUser authUser, @PathVariable("menuId") Long menuId){
-        OrderCreateResponseDto orderCreateResponseDto = orderService.createOrder(authUser, menuId);
+    @PostMapping("/stores/{storeId}/menus/{menuId}/orders")
+    public ResponseEntity<OrderCreateResponseDto> createOrder(AuthUser authUser, @PathVariable("storeId") Long storeId, @PathVariable("menuId") Long menuId){
+        OrderCreateResponseDto orderCreateResponseDto = orderService.createOrder(authUser, storeId, menuId);
         return new ResponseEntity<>(orderCreateResponseDto, HttpStatus.OK);
     }
 

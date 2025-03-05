@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 public class OrderCreateResponseDto {
     private final Long id;
+    private final Long storeId;
     private final OrderStatus orderStatus;
     private final String storeName;
     private final String menuName;
@@ -18,8 +19,9 @@ public class OrderCreateResponseDto {
     private final LocalDateTime createdAt;
 
     @Builder
-    public OrderCreateResponseDto(Long id, OrderStatus orderStatus,String storeName, String menuName, Long menuPrice, LocalDateTime createdAt) {
+    public OrderCreateResponseDto(Long id, Long storeId, OrderStatus orderStatus,String storeName, String menuName, Long menuPrice, LocalDateTime createdAt) {
         this.id = id;
+        this.storeId = storeId;
         this.orderStatus = orderStatus;
         this.storeName = storeName;
         this.menuName = menuName;

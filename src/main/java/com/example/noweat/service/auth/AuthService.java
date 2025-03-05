@@ -69,7 +69,7 @@ public class AuthService {
         }
 
         if(!passwordEncoder.matches(userSigninRequestDto.getPassword(), findUser.getPassword())){
-            throw new UnauthorizedException(ErrorCode.INVALID_PASSWORD);
+            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
         }
 
         // 리프레시 토큰을 찾아서 존재한다면 유효한지 검사, 유효하다면 예외를 던지고 유효하지 않으면 db에서 제거함
