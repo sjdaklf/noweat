@@ -39,7 +39,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
 
     @Transactional
-    public OrderCreateResponseDto createOrder(AuthUser authUser, Long storeId, Long menuId){
+    public OrderCreateResponseDto createOrder(AuthUser authUser, Long menuId){
 
         LocalTime currentTime = LocalTime.now();
 
@@ -54,7 +54,14 @@ public class OrderService {
             throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
         }
 
-        Store findStore = storeRepository.findById(storeId).orElseThrow(() -> new NotFoundException(ErrorCode.STORE_NOT_EXIST));
+        Menu findMenu = menuRepository.findById(menuId).orElseThrow(() -> new NotFoundException(ErrorCode.MENU_NOT_EXIST));
+
+        // 삭제된 메뉴는 주문할 수 없음
+        if(findMenu.isDeleted()){
+            throw new GoneException(ErrorCode.MENU_DELETED);
+        }
+
+        Store findStore = findMenu.getStore();
 
         // 폐업된 가게면 주문을 생성할 수 없음
         if(findStore.isClosed()){
@@ -64,18 +71,6 @@ public class OrderService {
         // 가게 엽업시간이 아닐 때 주문 할 수 없음
         if(currentTime.isBefore(findStore.getOpenTime()) || currentTime.isAfter(findStore.getClosedTime())){
             throw new BadRequestException(ErrorCode.STORE_NOT_OPEN);
-        }
-
-        Menu findMenu = menuRepository.findById(menuId).orElseThrow(() -> new NotFoundException(ErrorCode.MENU_NOT_EXIST));
-
-        // 해당 가게의 메뉴가 아니라면 예외
-        if(storeId != findMenu.getStore().getId()){
-            throw new BadRequestException(ErrorCode.INVALID_MENU_FOR_STORE);
-        }
-
-        // 삭제된 메뉴는 주문할 수 없음
-        if(findMenu.isDeleted()){
-            throw new GoneException(ErrorCode.MENU_DELETED);
         }
 
         // 주문 금액이 최소 주문금액보다 적으면 예외 발생
