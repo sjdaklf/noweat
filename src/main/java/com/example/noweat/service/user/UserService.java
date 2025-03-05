@@ -41,9 +41,21 @@ public class UserService {
 
         verifyUser(findUser);
 
-        // USER 는 다른 사용자(USER, OWNER) 의 정보에 접근 불가
-        if(authUser.getUserRole() == UserRole.USER){
+        // USER 는 다른 사용자(USER, OWNER) 의 정보에 접근 불가, 자신의 정보만 접근 가능
+        if(authUser.getUserRole() == UserRole.USER && !authUser.getId().equals(userId)){
             throw new ForbiddenException(ErrorCode.NOT_OWNER);
+        }
+
+        // 유저는 자신의 정보만 조회 가능
+        if(authUser.getUserRole() == UserRole.USER){
+            return new UserFindResponseDto(
+                    findUser.getId(),
+                    findUser.getName(),
+                    findUser.getAddress(),
+                    findUser.getUserRole(),
+                    findUser.getCreatedAt(),
+                    findUser.getUpdatedAt()
+            );
         }
 
         // OWNER 는 자신의 정보 또는 USER 의 정보에만 접근이 가능
