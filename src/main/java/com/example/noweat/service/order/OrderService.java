@@ -50,23 +50,18 @@ public class OrderService {
 
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
-        if(findUser.isDeleted()){
-            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
-        }
+        // 삭제된 유저인지 확인
+        verifyUser(findUser);
 
         Menu findMenu = menuRepository.findById(menuId).orElseThrow(() -> new NotFoundException(ErrorCode.MENU_NOT_EXIST));
 
         // 삭제된 메뉴는 주문할 수 없음
-        if(findMenu.isDeleted()){
-            throw new GoneException(ErrorCode.MENU_DELETED);
-        }
+        verifyMenu(findMenu);
 
         Store findStore = findMenu.getStore();
 
         // 폐업된 가게면 주문을 생성할 수 없음
-        if(findStore.isClosed()){
-            throw new GoneException(ErrorCode.STORE_CLOSED);
-        }
+        verifyStore(findStore);
 
         // 가게 엽업시간이 아닐 때 주문 할 수 없음
         if(currentTime.isBefore(findStore.getOpenTime()) || currentTime.isAfter(findStore.getClosedTime())){
@@ -102,6 +97,9 @@ public class OrderService {
     @Transactional
     public OrderStatusUpdateResponseDto updateOrderStatus(AuthUser authUser, Long orderId, OrderStatusUpdateRequestDto orderStatusUpdateRequestDto){
 
+        // 주문 상태에 맞지않는 값이면 예외
+        OrderStatus orderStatus = OrderStatus.of(orderStatusUpdateRequestDto.getOrderStatus());
+
         // 사장님만 주문 상태를 변경할 수 있다.
         if(authUser.getUserRole() != UserRole.OWNER){
             throw new ForbiddenException(ErrorCode.NOT_OWNER);
@@ -109,12 +107,7 @@ public class OrderService {
 
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
-        if(findUser.isDeleted()){
-            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
-        }
-
-        // 주문 상태에 맞지않는 값이면 예외
-        OrderStatus orderStatus = OrderStatus.of(orderStatusUpdateRequestDto.getOrderStatus());
+        verifyUser(findUser);
 
         Order findOrder = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_EXIST));
 
@@ -141,9 +134,7 @@ public class OrderService {
 
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
-        if(findUser.isDeleted()){
-            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
-        }
+        verifyUser(findUser);
 
         // 유저의 id로 주문 목록 찾기
         List<Order> orders = orderRepository.findByUser_Id(authUser.getId());
@@ -168,9 +159,7 @@ public class OrderService {
 
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
-        if(findUser.isDeleted()){
-            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
-        }
+        verifyUser(findUser);
 
         // 사장의 아이디로 주문 목록 찾기
         List<Order> orders = orderRepository.findByOwnerUserId(authUser.getId());
@@ -196,9 +185,7 @@ public class OrderService {
 
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
-        if(findUser.isDeleted()){
-            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
-        }
+        verifyUser(findUser);
 
         Order findOrder = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_EXIST));
 
@@ -218,9 +205,7 @@ public class OrderService {
 
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
-        if(findUser.isDeleted()){
-            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
-        }
+        verifyUser(findUser);
 
         Order findOrder = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_EXIST));
 
@@ -230,5 +215,23 @@ public class OrderService {
 
         orderRepository.deleteById(orderId);
 
+    }
+
+    public void verifyUser(User findUser) {
+        if (findUser.isDeleted()) {
+            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
+        }
+    }
+
+    public void verifyStore(Store findStore) {
+        if (findStore.isClosed()) {
+            throw new GoneException(ErrorCode.STORE_CLOSED);
+        }
+    }
+
+    public void verifyMenu(Menu findMenu) {
+        if (findMenu.isDeleted()) {
+            throw new GoneException(ErrorCode.MENU_DELETED);
+        }
     }
 }

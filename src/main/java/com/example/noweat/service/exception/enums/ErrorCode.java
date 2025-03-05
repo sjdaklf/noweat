@@ -23,6 +23,7 @@ public enum ErrorCode {
     INVALID_BEARER_TOKEN("유효한 Bearer 토큰이 필요합니다.", HttpStatus.UNAUTHORIZED),
     JWT_ERROR("JWT 처리 중 오류가 발생했습니다.", HttpStatus.UNAUTHORIZED),
 
+
     // 403 에러
     NOT_OWNER("사장 권한을 가지고 있지않습니다.", HttpStatus.FORBIDDEN),
     NOT_USER("유저 권한을 가지고 있지않습니다.", HttpStatus.FORBIDDEN),
