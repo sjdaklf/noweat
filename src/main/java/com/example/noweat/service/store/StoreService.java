@@ -112,8 +112,8 @@ public class StoreService {
         for (Menu menu : findMenus) {
             dtos.add(StoreMenuResponseDto.builder()
                     .menuId(menu.getId())
-                    .menuName(menu.getMenuName())
-                    .menuPrice(menu.getMenuPrice())
+                    .menuName(menu.getName())
+                    .menuPrice(menu.getPrice())
                     .build());
         }
 

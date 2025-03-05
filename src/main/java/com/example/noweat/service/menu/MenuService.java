@@ -2,120 +2,160 @@ package com.example.noweat.service.menu;
 
 import com.example.noweat.domain.menu.Menu;
 import com.example.noweat.domain.store.Store;
-import com.example.noweat.dto.menu.request.MenuSaveRequest;
-import com.example.noweat.dto.menu.request.MenuUpdateRequest;
-import com.example.noweat.dto.menu.response.MenuResponse;
-import com.example.noweat.dto.menu.response.MenuSaveResponse;
-import com.example.noweat.dto.menu.response.MenuUpdateResponse;
+import com.example.noweat.domain.user.User;
+import com.example.noweat.domain.user.UserRole;
+import com.example.noweat.dto.menu.request.MenuSaveRequestDto;
+import com.example.noweat.dto.menu.request.MenuUpdateRequestDto;
+import com.example.noweat.dto.menu.response.MenuResponseDto;
+import com.example.noweat.dto.menu.response.MenuSaveResponseDto;
+import com.example.noweat.dto.menu.response.MenuUpdateResponseDto;
+import com.example.noweat.global.argumentResolver.AuthUser;
 import com.example.noweat.repository.menu.MenuRepository;
 import com.example.noweat.repository.store.StoreRepository;
-import com.example.noweat.service.exception.NotFoundException;
+import com.example.noweat.repository.user.UserRepository;
+import com.example.noweat.service.exception.*;
 import com.example.noweat.service.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MenuService {
 
-    private final MenuRepository menuRepository;
+    private final UserRepository userRepository;
     private final StoreRepository storeRepository;
+    private final MenuRepository menuRepository;
 
     @Transactional
-    public MenuSaveResponse saveMenu(Long storeId, MenuSaveRequest request) {
+    public MenuSaveResponseDto saveMenu(AuthUser authUser, Long storeId, MenuSaveRequestDto request) {
 
-        Store store = storeRepository.findById(storeId).orElseThrow(() ->
+        User findUser = userRepository.findById(authUser.getId()).orElseThrow(() ->
+                new NotFoundException(ErrorCode.NOT_FOUND_USER));
+
+        verifyUser(findUser); // 탈퇴한 유저인지 확인
+
+        if (!findUser.getUserRole().equals(UserRole.OWNER)) { // 사용자 역할이 OWNER 가 아니면 예외
+            throw new BadRequestException(ErrorCode.INVALID_USER_ROLE);
+        }
+
+        Store findStore = storeRepository.findById(storeId).orElseThrow(() ->
                 new NotFoundException(ErrorCode.STORE_NOT_EXIST));
 
+        if (!findStore.getUser().getId().equals(findUser.getId())) { // 요청한 사용자의 가게가 맞는지 확인
+            throw new ForbiddenException(ErrorCode.STORE_NOT_MATCH);
+        }
+
+        verifyStore(findStore); // 폐업한 가게인지 확인
+
+        if (menuRepository.existsByUser_IdAndName(findUser.getId(), request.getName())) { // 중복된 메뉴 검증
+            throw new ConflictException(ErrorCode.DUPLICATE_MENU);
+        }
+
         Menu menu = Menu.builder()
-//                .user()
-                .store(store)
-                .menuName(request.getMenuName())
-                .menuPrice(request.getMenuPrice())
+                .user(findUser)
+                .store(findStore)
+                .name(request.getName())
+                .price(request.getPrice())
                 .build();
 
         Menu savedMenu = menuRepository.save(menu);
 
-        return new MenuSaveResponse(
-                savedMenu.getId(),
-                savedMenu.getMenuName(),
-                savedMenu.getMenuPrice(),
-                savedMenu.getCreatedAt()
-        );
+        return MenuSaveResponseDto.builder()
+                .id(savedMenu.getId())
+                .name(savedMenu.getName())
+                .price(savedMenu.getPrice())
+                .createdAt(savedMenu.getCreatedAt())
+                .build();
     }
 
     @Transactional(readOnly = true)
-    public List<MenuResponse> findAllMenu(Long storeId) {
+    public List<MenuResponseDto> findAllMenu(Long storeId) {
 
-        if(!storeRepository.existsById(storeId)) { // store가 없을 때
+        if (!storeRepository.existsStoreById(storeId)) { // store가 없을 때 (폐업된 가게는 조회하지 않음)
             throw new NotFoundException(ErrorCode.STORE_NOT_EXIST);
         }
 
-        List<Menu> findMenus = new ArrayList<>(); // 나중에 지우기
+        List<Menu> findMenus = menuRepository.findMenuByStoreId(storeId);
 
-        Menu menu1 = Menu.builder()
-                .menuName("메뉴이름1")
-                .menuPrice(1000L)
-                .build();
+        return findMenus.stream()
+                .map(menu -> new MenuResponseDto(menu.getId(), menu.getName(), menu.getPrice()))
+                .toList();
+    }
 
-        menu1.setId(1L);
-        findMenus.add(menu1);
+    public MenuUpdateResponseDto updateMenu(AuthUser authUser, Long menuId, MenuUpdateRequestDto request) {
 
-        Menu menu2 = Menu.builder()
-                .menuName("메뉴이름2")
-                .menuPrice(1000L)
-                .build();
+        User findUser = userRepository.findById(authUser.getId()).orElseThrow(() ->
+                new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
-        menu2.setId(2L);
-        findMenus.add(menu2); // 여기까지 지우기
+        verifyUser(findUser); // 탈퇴한 유저인지 확인
 
-//        List<Menu> findMenus = menuRepository.findMenuByStore_Id(storeId);
-
-        List<MenuResponse> dtoList = new ArrayList<>();
-        for (Menu menu : findMenus) {
-            MenuResponse dto = new MenuResponse(
-                    menu.getId(),
-                    menu.getMenuName(),
-                    menu.getMenuPrice()
-            );
-            dtoList.add(dto);
+        if (!findUser.getUserRole().equals(UserRole.OWNER)) { // 사용자 역할이 OWNER 가 아니면 예외
+            throw new BadRequestException(ErrorCode.INVALID_USER_ROLE);
         }
-        return dtoList;
+
+        Menu findMenu = menuRepository.findById(menuId).orElseThrow(() ->
+                new NotFoundException(ErrorCode.MENU_NOT_EXIST));
+
+        if (!findMenu.getUser().getId().equals(findUser.getId())){ // 자신이 만든 메뉴가 맞는지 확인
+            throw new ForbiddenException(ErrorCode.MENU_NOT_MATCH);
+        }
+
+        verifyMenu(findMenu); // 삭제된 메뉴인지 확인
+
+        findMenu.updateMenu(request.getName(), request.getPrice());
+
+        Menu savedMenu = menuRepository.save(findMenu);
+
+        return MenuUpdateResponseDto.builder()
+                .name(savedMenu.getName())
+                .price(savedMenu.getPrice())
+                .createdAt(savedMenu.getCreatedAt())
+                .updatedAt(savedMenu.getUpdatedAt())
+                .build();
     }
 
+    @Transactional
+    public void deleteMenu(AuthUser authUser, Long menuId) {
 
-    public MenuUpdateResponse updateMenu(Long menuId, MenuUpdateRequest request) {
+        User findUser = userRepository.findById(authUser.getId()).orElseThrow(() ->
+                new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
-        Menu menu = Menu.builder() // 지우기
-                .menuName("메뉴이름1")
-                .menuPrice(1000L)
-                .build();
+        verifyUser(findUser); // 탈퇴한 유저인지 확인
 
-        menu.setId(1L);
+        if (!findUser.getUserRole().equals(UserRole.OWNER)) { // 사용자 역할이 OWNER 가 아니면 예외
+            throw new BadRequestException(ErrorCode.INVALID_USER_ROLE);
+        }
 
-//        Menu menu = menuRepository.findById(menuId).orElseThrow(() ->
-//                new NotFoundException(ErrorCode.MENU_NOT_EXIST));
+        Menu findMenu = menuRepository.findById(menuId).orElseThrow(() ->
+                new NotFoundException(ErrorCode.MENU_NOT_EXIST));
 
-        menu.updateMenu(request.getMenuName(), request.getMenuPrice());
+        if (!findMenu.getUser().getId().equals(findUser.getId())){ // 자신이 만든 메뉴가 맞는지 확인
+            throw new ForbiddenException(ErrorCode.MENU_NOT_MATCH);
+        }
 
-        return new MenuUpdateResponse(menu.getMenuName(), menu.getMenuPrice(), menu.getCreatedAt(), menu.getUpdatedAt());
+        verifyMenu(findMenu); // 삭제된 메뉴인지 확인
+
+        findMenu.deleteMenu(); // 소프트 delete
     }
 
-    public void deleteMenu(Long menuId) {
-        Menu menu = Menu.builder() // 지우기
-                .menuName("메뉴이름1")
-                .menuPrice(1000L)
-                .build();
+    public void verifyUser(User findUser) {
+        if (findUser.isDeleted()) {
+            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
+        }
+    }
 
-        menu.setId(1L);
+    public void verifyStore(Store findStore) {
+        if (findStore.isClosed()) {
+            throw new GoneException(ErrorCode.STORE_CLOSED);
+        }
+    }
 
-//        Menu menu = menuRepository.findById(menuId).orElseThrow(() ->
-//                new NotFoundException(ErrorCode.MENU_NOT_EXIST));
-
-        menu.deleteMenu();
+    public void verifyMenu(Menu findMenu) {
+        if (findMenu.isDeleted()) {
+            throw new GoneException(ErrorCode.MENU_DELETED);
+        }
     }
 }
