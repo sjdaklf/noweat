@@ -14,6 +14,7 @@ import com.example.noweat.repository.review.ReviewRepository;
 import com.example.noweat.repository.store.StoreRepository;
 import com.example.noweat.repository.user.UserRepository;
 import com.example.noweat.service.exception.ConflictException;
+import com.example.noweat.service.exception.GoneException;
 import com.example.noweat.service.exception.NotFoundException;
 import com.example.noweat.service.exception.UnauthorizedException;
 import com.example.noweat.service.exception.enums.ErrorCode;
@@ -216,7 +217,7 @@ public class UserService {
 
     public void verifyUser(User findUser) {
         if (findUser.isDeleted()) {
-            throw new UnauthorizedException(ErrorCode.DELETED_USER);
+            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
         }
     }
 }

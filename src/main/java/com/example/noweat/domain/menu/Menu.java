@@ -26,24 +26,24 @@ public class Menu extends BaseEntity {
     @JoinColumn(name = "store_id")
     private Store store;
 
-    private String menuName;
+    private String name;
 
-    private Long menuPrice;
+    private Long price;
 
     private boolean isDeleted;
 
     @Builder
-    public Menu(Store store, User user, String menuName, Long menuPrice, boolean isDeleted) {
+    public Menu(Store store, User user, String name, Long price, boolean isDeleted) {
         this.store = store;
         this.user = user;
-        this.menuName = menuName;
-        this.menuPrice = menuPrice;
+        this.name = name;
+        this.price = price;
         this.isDeleted = isDeleted;
     }
 
-    public void updateMenu(String menuName, Long menuPrice) {
-        this.menuName = menuName;
-        this.menuPrice = menuPrice;
+    public void updateMenu(String name, Long price) {
+        this.name = name;
+        this.price = price;
     }
 
     public void deleteMenu() {

@@ -24,6 +24,8 @@ public enum ErrorCode {
     NOT_STORE_OWNER("해당 가게의 사장 권한을 가지고 있지 않습니다.", HttpStatus.UNAUTHORIZED),
 
     // 403 에러
+    STORE_NOT_MATCH("권한이 없는 가게입니다.", HttpStatus.FORBIDDEN),
+    MENU_NOT_MATCH("권한이 없는 메뉴입니다.", HttpStatus.FORBIDDEN),
 
     // 404 에러
     NOT_FOUND_USER("존재하지 않는 유저입니다.", HttpStatus.NOT_FOUND),
@@ -36,10 +38,12 @@ public enum ErrorCode {
     USER_ALREADY_LOGGED_IN("이미 로그인된 사용자입니다.", HttpStatus.CONFLICT),
     SAME_AS_PREVIOUS_PASSWORD("새 비밀번호는 기존 비밀번호와 같을 수 없습니다.", HttpStatus.CONFLICT),
     MAX_STORE_LIMIT_EXCEEDED("가게를 최대 3개까지만 운영할 수 있습니다.", HttpStatus.CONFLICT),
+    DUPLICATE_MENU("이미 생성된 메뉴입니다.", HttpStatus.CONFLICT),
 
     //410 에러
     USER_ALREADY_DELETED("탈퇴한 회원입니다.", HttpStatus.GONE),
-    STORE_CLOSED("폐업된 가게입니다.", HttpStatus.GONE);
+    STORE_CLOSED("폐업된 가게입니다.", HttpStatus.GONE),
+    MENU_DELETED("삭제된 메뉴입니다.", HttpStatus.GONE);
 
     private String message;
     private HttpStatus httpStatus;
