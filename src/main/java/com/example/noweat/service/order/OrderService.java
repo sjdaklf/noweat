@@ -39,7 +39,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
 
     @Transactional
-    public OrderCreateResponseDto createOrder(AuthUser authUser, Long menuId){
+    public OrderCreateResponseDto createOrder(AuthUser authUser, Long storeId, Long menuId){
 
         LocalTime currentTime = LocalTime.now();
 
@@ -54,8 +54,7 @@ public class OrderService {
             throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
         }
 
-        Menu findMenu = menuRepository.findById(menuId).orElseThrow(() -> new NotFoundException(ErrorCode.MENU_NOT_EXIST));
-        Store findStore = findMenu.getStore();
+        Store findStore = storeRepository.findById(storeId).orElseThrow(() -> new NotFoundException(ErrorCode.STORE_NOT_EXIST));
 
         // 폐업된 가게면 주문을 생성할 수 없음
         if(findStore.isClosed()){
@@ -65,6 +64,13 @@ public class OrderService {
         // 가게 엽업시간이 아닐 때 주문 할 수 없음
         if(currentTime.isBefore(findStore.getOpenTime()) || currentTime.isAfter(findStore.getClosedTime())){
             throw new BadRequestException(ErrorCode.STORE_NOT_OPEN);
+        }
+
+        Menu findMenu = menuRepository.findById(menuId).orElseThrow(() -> new NotFoundException(ErrorCode.MENU_NOT_EXIST));
+
+        // 해당 가게의 메뉴가 아니라면 예외
+        if(storeId != findMenu.getStore().getId()){
+            throw new BadRequestException(ErrorCode.INVALID_MENU_FOR_STORE);
         }
 
         // 삭제된 메뉴는 주문할 수 없음
@@ -89,6 +95,7 @@ public class OrderService {
 
         return OrderCreateResponseDto.builder()
                 .id(saveOrder.getId())
+                .storeId(findStore.getId())
                 .orderStatus(saveOrder.getOrderStatus())
                 .storeName(saveOrder.getStore().getStoreName())
                 .menuName(saveOrder.getMenuName())
@@ -105,6 +112,12 @@ public class OrderService {
             throw new ForbiddenException(ErrorCode.NOT_OWNER);
         }
 
+        User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
+
+        if(findUser.isDeleted()){
+            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
+        }
+
         // 주문 상태에 맞지않는 값이면 예외
         OrderStatus orderStatus = OrderStatus.of(orderStatusUpdateRequestDto.getOrderStatus());
 
@@ -118,6 +131,8 @@ public class OrderService {
         findOrder.updateOrderStatus(orderStatus);
 
         return OrderStatusUpdateResponseDto.builder()
+                .id(findOrder.getId())
+                .storeId(findOrder.getStore().getId())
                 .orderStatus(findOrder.getOrderStatus())
                 .build();
     }
@@ -127,6 +142,12 @@ public class OrderService {
         // 유저의 주문한 목록을 볼 수 있음
         if(authUser.getUserRole() != UserRole.USER){
             throw new ForbiddenException(ErrorCode.NOT_USER);
+        }
+
+        User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
+
+        if(findUser.isDeleted()){
+            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
         }
 
         // 유저의 id로 주문 목록 찾기
@@ -150,6 +171,12 @@ public class OrderService {
             throw new ForbiddenException(ErrorCode.NOT_OWNER);
         }
 
+        User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
+
+        if(findUser.isDeleted()){
+            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
+        }
+
         // 사장의 아이디로 주문 목록 찾기
         List<Order> orders = orderRepository.findByOwnerUserId(authUser.getId());
 
@@ -168,11 +195,17 @@ public class OrderService {
     @Transactional
     public void deleteUsersOrder(AuthUser authUser, Long orderId){
 
-        Order findOrder = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_EXIST));
-
         if(authUser.getUserRole() != UserRole.USER){
             throw new ForbiddenException(ErrorCode.NOT_USER);
         }
+
+        User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
+
+        if(findUser.isDeleted()){
+            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
+        }
+
+        Order findOrder = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_EXIST));
 
         if(authUser.getId() != findOrder.getUser().getId()){
             throw new ForbiddenException(ErrorCode.NOT_USERS_ORDER);
@@ -184,11 +217,17 @@ public class OrderService {
     @Transactional
     public void deleteOwnersOrder(AuthUser authUser, Long orderId){
 
-        Order findOrder = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_EXIST));
-
         if(authUser.getUserRole() != UserRole.OWNER){
             throw new ForbiddenException(ErrorCode.NOT_OWNER);
         }
+
+        User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
+
+        if(findUser.isDeleted()){
+            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
+        }
+
+        Order findOrder = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_EXIST));
 
         if(authUser.getId() != findOrder.getStore().getUser().getId()){
             throw new ForbiddenException(ErrorCode.NOT_OWNERS_ORDER);

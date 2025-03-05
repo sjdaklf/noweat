@@ -11,11 +11,12 @@ public enum ErrorCode {
     REFRESH_TOKEN_REQUIRED("RefreshToken 이 필요합니다.", HttpStatus.BAD_REQUEST),
     ORDER_PRICE_TOO_LOW("최소 주문 금액을 만족하지 못했습니다.", HttpStatus.BAD_REQUEST),
     STORE_NOT_OPEN("가게 오픈 시간이 아닙니다.", HttpStatus.BAD_REQUEST),
+    INVALID_PASSWORD("잘못된 비밀번호입니다.", HttpStatus.BAD_REQUEST),
+    INVALID_MENU_FOR_STORE("해당 가게에 속하지 않은 메뉴입니다.", HttpStatus.BAD_REQUEST),
     INVALID_OPENTIME_CLOSEDTIME("오픈 시간이 마감 시간보다 늦거나 같을 수 없습니다.", HttpStatus.BAD_REQUEST),
     INVALID_STORE_CATEGORY("유효하지 않은 카테고리입니다.", HttpStatus.BAD_REQUEST),
 
     // 401 에러
-    INVALID_PASSWORD("잘못된 비밀번호입니다.", HttpStatus.UNAUTHORIZED),
     ACCESS_TOKEN_EXPIRED("만료된 AccessToken 입니다.", HttpStatus.UNAUTHORIZED),
     REFRESH_TOKEN_EXPIRED("만료된 RefreshToken 입니다.", HttpStatus.UNAUTHORIZED),
     MISSING_AUTHORIZATION_HEADER("Authorization 헤더가 존재하지 않습니다.", HttpStatus.UNAUTHORIZED),

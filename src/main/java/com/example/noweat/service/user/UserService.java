@@ -35,11 +35,21 @@ public class UserService {
     private final ReviewRepository reviewRepository;
 
     @Transactional(readOnly = true)
-    public UserResponseDto findUser(AuthUser authUser) {
+    public UserResponseDto findUser(AuthUser authUser, Long userId) {
 
-        User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
+        User findUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
         verifyUser(findUser);
+
+        // USER 는 다른 사용자(USER, OWNER) 의 정보에 접근 불가
+        if(authUser.getUserRole() == UserRole.USER){
+            throw new ForbiddenException(ErrorCode.NOT_OWNER);
+        }
+
+        // OWNER 는 자신의 정보 또는 USER 의 정보에만 접근이 가능
+        if(findUser.getUserRole() == UserRole.OWNER && authUser.getId() != findUser.getId()){
+            throw new ForbiddenException(ErrorCode.NO_ACCESS_TO_OWNER_INFO);
+        }
 
         if (findUser.getUserRole() != UserRole.OWNER) {
 
@@ -170,7 +180,7 @@ public class UserService {
         }
 
         if (!passwordEncoder.matches(userUpdatePasswordRequestDto.getOldPassword(), findUser.getPassword())) {
-            throw new UnauthorizedException(ErrorCode.INVALID_PASSWORD);
+            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
         }
 
         findUser.updatePassword(passwordEncoder.encode(userUpdatePasswordRequestDto.getNewPassword()));
@@ -210,7 +220,7 @@ public class UserService {
         verifyUser(findUser);
 
         if (!passwordEncoder.matches(userDeleteRequestDto.getPassword(), findUser.getPassword())) {
-            throw new UnauthorizedException(ErrorCode.INVALID_PASSWORD);
+            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
         }
 
         findUser.deleteUser(true);

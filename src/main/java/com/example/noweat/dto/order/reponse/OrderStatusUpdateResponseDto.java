@@ -6,10 +6,14 @@ import lombok.Getter;
 
 @Getter
 public class OrderStatusUpdateResponseDto {
+    private final Long id;
+    private final Long storeId;
     private final OrderStatus orderStatus;
 
     @Builder
-    public OrderStatusUpdateResponseDto(OrderStatus orderStatus){
+    public OrderStatusUpdateResponseDto(Long id, Long storeId, OrderStatus orderStatus) {
+        this.id = id;
+        this.storeId = storeId;
         this.orderStatus = orderStatus;
     }
 }

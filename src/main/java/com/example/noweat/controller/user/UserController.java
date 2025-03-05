@@ -19,9 +19,9 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/users")
-    public ResponseEntity<UserResponseDto> findUser(AuthUser authUser) {
-        UserResponseDto userResponseDto = userService.findUser(authUser);
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<UserResponseDto> findUser(AuthUser authUser, @PathVariable("userId") Long userId) {
+        UserResponseDto userResponseDto = userService.findUser(authUser, userId);
         return ResponseEntity.ok(userResponseDto);
     }
 
