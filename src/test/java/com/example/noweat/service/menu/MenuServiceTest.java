@@ -33,7 +33,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -115,7 +114,6 @@ public class MenuServiceTest {
 
         List<MenuResponseDto> list = menuList.stream().map(menu -> new MenuResponseDto(menu.getId(), menu.getName(), menu.getPrice())).toList();
 
-        given(storeRepository.existsStoreById(anyLong())).willReturn(true);
         given(menuRepository.findMenuByStoreId(any())).willReturn(menuList);
 
         // when
@@ -127,7 +125,6 @@ public class MenuServiceTest {
         assertEquals(list.get(1).getName(), allMenu.get(1).getName());
         assertEquals(list.get(1).getPrice(), allMenu.get(1).getPrice());
 
-        verify(storeRepository, times(1)).existsStoreById(any());
         verify(menuRepository, times(1)).findMenuByStoreId(any());
     }
 
