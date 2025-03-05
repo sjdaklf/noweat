@@ -14,8 +14,8 @@ import java.util.List;
 public class StoreFindOneResponseDto {
 
     private final Long id;
-    private final String storeName;
-    private final String storeAddress;
+    private final String name;
+    private final String address;
     private final StoreCategory storeCategory;
     private final Long minOrderPrice;
     private final LocalTime openTime;
@@ -30,10 +30,10 @@ public class StoreFindOneResponseDto {
     private final LocalDateTime updatedAt;
 
     @Builder
-    public StoreFindOneResponseDto(Long id, String storeName, String storeAddress, StoreCategory storeCategory, Long minOrderPrice, LocalTime openTime, LocalTime closedTime, Double averageRating, List<StoreMenuResponseDto> menuList, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public StoreFindOneResponseDto(Long id, String name, String address, StoreCategory storeCategory, Long minOrderPrice, LocalTime openTime, LocalTime closedTime, Double averageRating, List<StoreMenuResponseDto> menuList, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
-        this.storeName = storeName;
-        this.storeAddress = storeAddress;
+        this.name = name;
+        this.address = address;
         this.storeCategory = storeCategory;
         this.minOrderPrice = minOrderPrice;
         this.openTime = openTime;

@@ -11,13 +11,13 @@ import java.time.LocalTime;
 public class StoreUpdateRequestDto {
 
     @NotBlank(message = "가게 이름은 필수 값 입니다.")
-    private String storeName;
+    private String name;
 
     @NotBlank(message = "가게 주소는 필수 값 입니다.")
-    private String storeAddress;
+    private String address;
 
     @NotNull(message = "가게 카테고리는 필수 값 입니다.")
-    private StoreCategory storeCategory;
+    private String storeCategory;
 
     @NotNull(message = "가게 최소 주문 금액은 필수 값 입니다.")
     private Long minOrderPrice;

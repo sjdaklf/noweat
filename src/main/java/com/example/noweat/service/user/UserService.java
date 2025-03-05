@@ -80,11 +80,11 @@ public class UserService {
         for (Store store : findStores) {
             UserStoreResponseDto userStoreResponseDto = new UserStoreResponseDto(
                     store.getId(),
-                    store.getStoreName(),
+                    store.getName(),
                     store.getStoreCategory(),
                     store.getMinOrderPrice(),
                     store.getAverageRating()
-                    );
+            );
 
             storeList.add(userStoreResponseDto);
         }

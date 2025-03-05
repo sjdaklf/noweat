@@ -12,16 +12,16 @@ import java.time.LocalTime;
 public class StoreSaveResponseDto {
 
     private final Long id;
-    private final String storeName;
+    private final String name;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime createdAt;
 
 
     @Builder
-    public StoreSaveResponseDto(Long id, String storeName, LocalDateTime createdAt) {
+    public StoreSaveResponseDto(Long id, String name, LocalDateTime createdAt) {
         this.id = id;
-        this.storeName = storeName;
+        this.name = name;
         this.createdAt = createdAt;
     }
 }

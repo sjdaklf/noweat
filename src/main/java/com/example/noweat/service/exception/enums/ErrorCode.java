@@ -8,6 +8,8 @@ public enum ErrorCode {
     INVALID_USER_ROLE("유효하지 않은 사용자 역할입니다.", HttpStatus.BAD_REQUEST),
     ACCESS_TOKEN_REQUIRED("AccessToken 이 필요합니다.", HttpStatus.BAD_REQUEST),
     REFRESH_TOKEN_REQUIRED("RefreshToken 이 필요합니다.", HttpStatus.BAD_REQUEST),
+    INVALID_OPENTIME_CLOSEDTIME("오픈 시간이 마감 시간보다 늦거나 같을 수 없습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_STORE_CATEGORY("유효하지 않은 카테고리입니다.", HttpStatus.BAD_REQUEST),
 
     // 401 에러
     INVALID_PASSWORD("잘못된 비밀번호입니다.", HttpStatus.UNAUTHORIZED),
@@ -19,6 +21,7 @@ public enum ErrorCode {
     NOT_OWNER("사장 권한을 가지고 있지않습니다.", HttpStatus.UNAUTHORIZED),
     NOT_USER("유저 권한을 가지고 있지않습니다.", HttpStatus.UNAUTHORIZED),
     DELETED_USER("탈퇴한 유저입니다.", HttpStatus.UNAUTHORIZED),
+    NOT_STORE_OWNER("해당 가게의 사장 권한을 가지고 있지 않습니다.", HttpStatus.UNAUTHORIZED),
 
     // 403 에러
 
@@ -34,6 +37,7 @@ public enum ErrorCode {
     MAX_STORE_LIMIT_EXCEEDED("가게를 최대 3개까지만 운영할 수 있습니다.", HttpStatus.CONFLICT),
 
     //410 에러
+    USER_ALREADY_DELETED("탈퇴한 회원입니다.", HttpStatus.GONE),
     STORE_CLOSED("폐업된 가게입니다.", HttpStatus.GONE);
 
     private String message;
