@@ -31,6 +31,7 @@ public enum ErrorCode {
     NOT_OWNERS_ORDER("사장님의 주문이 아닙니다.", HttpStatus.FORBIDDEN),
     STORE_NOT_MATCH("권한이 없는 가게입니다.", HttpStatus.FORBIDDEN),
     MENU_NOT_MATCH("권한이 없는 메뉴입니다.", HttpStatus.FORBIDDEN),
+    NO_ACCESS_TO_OWNER_INFO("다른 사장의 정보에 접근할 수 없습니다.", HttpStatus.FORBIDDEN),
 
     // 404 에러
     NOT_FOUND_USER("존재하지 않는 유저입니다.", HttpStatus.NOT_FOUND),

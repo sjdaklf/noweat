@@ -228,7 +228,7 @@ public class UserService {
 
     public void verifyUser(User findUser) {
         if (findUser.isDeleted()) {
-            throw new UnauthorizedException(ErrorCode.DELETED_USER);
+            throw new UnauthorizedException(ErrorCode.USER_ALREADY_DELETED);
         }
     }
 }

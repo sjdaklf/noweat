@@ -74,7 +74,7 @@ public class OrderService {
         }
 
         // 주문 금액이 최소 주문금액보다 적으면 예외 발생
-        if(findStore.getMinOrderPrice() > findMenu.getMenuPrice()){
+        if(findStore.getMinOrderPrice() > findMenu.getPrice()){
             throw new BadRequestException(ErrorCode.ORDER_PRICE_TOO_LOW);
         }
 
@@ -82,8 +82,8 @@ public class OrderService {
                 .user(findUser)
                 .store(findStore)
                 .orderStatus(OrderStatus.PENDING)
-                .menuName(findMenu.getMenuName())
-                .menuPrice(findMenu.getMenuPrice())
+                .menuName(findMenu.getName())
+                .menuPrice(findMenu.getPrice())
                 .build();
 
         Order saveOrder = orderRepository.save(order);
@@ -92,7 +92,7 @@ public class OrderService {
                 .id(saveOrder.getId())
                 .storeId(findStore.getId())
                 .orderStatus(saveOrder.getOrderStatus())
-                .storeName(saveOrder.getStore().getStoreName())
+                .storeName(saveOrder.getStore().getName())
                 .menuName(saveOrder.getMenuName())
                 .menuPrice(saveOrder.getMenuPrice())
                 .createdAt(saveOrder.getCreatedAt())
@@ -151,7 +151,7 @@ public class OrderService {
         return orders.stream().map(order -> OrderUserResponseDto.builder()
                 .id(order.getId())
                 .orderStatus(order.getOrderStatus())
-                .storeName(order.getStore().getStoreName())
+                .storeName(order.getStore().getName())
                 .menuName(order.getMenuName())
                 .menuPrice(order.getMenuPrice())
                 .createdAt(order.getCreatedAt())
@@ -179,7 +179,7 @@ public class OrderService {
                 .id(order.getId())
                         .orderUserId(order.getUser().getId())
                 .orderStatus(order.getOrderStatus())
-                .storeName(order.getStore().getStoreName())
+                .storeName(order.getStore().getName())
                 .menuName(order.getMenuName())
                 .menuPrice(order.getMenuPrice())
                 .createdAt(order.getCreatedAt())
