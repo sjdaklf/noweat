@@ -22,9 +22,9 @@ public class Store extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String storeName;
+    private String name;
 
-    private String storeAddress;
+    private String address;
 
     @Enumerated(value = EnumType.STRING)
     private StoreCategory storeCategory;
@@ -40,10 +40,10 @@ public class Store extends BaseEntity {
     private boolean isClosed;
 
     @Builder
-    public Store(User user, String storeName, String storeAddress, StoreCategory storeCategory, Long minOrderPrice, Double averageRating, LocalTime openTime, LocalTime closedTime, boolean isClosed) {
+    public Store(User user, String name, String address, StoreCategory storeCategory, Long minOrderPrice, Double averageRating, LocalTime openTime, LocalTime closedTime, boolean isClosed) {
         this.user = user;
-        this.storeName = storeName;
-        this.storeAddress = storeAddress;
+        this.name = name;
+        this.address = address;
         this.storeCategory = storeCategory;
         this.minOrderPrice = minOrderPrice;
         this.averageRating = averageRating;
@@ -52,9 +52,9 @@ public class Store extends BaseEntity {
         this.isClosed = isClosed;
     }
 
-    public void updateStore(String storeName, String storeAddress, StoreCategory storeCategory, Long minOrderPrice, LocalTime openTime, LocalTime closedTime) {
-        this.storeName = storeName;
-        this.storeAddress = storeAddress;
+    public void updateStore(String name, String address, StoreCategory storeCategory, Long minOrderPrice, LocalTime openTime, LocalTime closedTime) {
+        this.name = name;
+        this.address = address;
         this.storeCategory = storeCategory;
         this.minOrderPrice = minOrderPrice;
         this.openTime = openTime;

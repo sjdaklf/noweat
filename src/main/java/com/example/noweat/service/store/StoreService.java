@@ -2,6 +2,7 @@ package com.example.noweat.service.store;
 
 import com.example.noweat.domain.menu.Menu;
 import com.example.noweat.domain.store.Store;
+import com.example.noweat.domain.store.StoreCategory;
 import com.example.noweat.domain.user.User;
 import com.example.noweat.domain.user.UserRole;
 import com.example.noweat.dto.store.request.StoreSaveRequestDto;
@@ -11,12 +12,9 @@ import com.example.noweat.global.argumentResolver.AuthUser;
 import com.example.noweat.repository.menu.MenuRepository;
 import com.example.noweat.repository.store.StoreRepository;
 import com.example.noweat.repository.user.UserRepository;
-import com.example.noweat.service.exception.ConflictException;
-import com.example.noweat.service.exception.GoneException;
-import com.example.noweat.service.exception.NotFoundException;
-import com.example.noweat.service.exception.UnauthorizedException;
+import com.example.noweat.service.exception.*;
 import com.example.noweat.service.exception.enums.ErrorCode;
-import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +32,8 @@ public class StoreService {
 
     @Transactional
     public StoreSaveResponseDto saveStore(AuthUser authUser, StoreSaveRequestDto storeSaveRequestDto) {
+        StoreCategory storeCategory = StoreCategory.of(storeSaveRequestDto.getStoreCategory());
+
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(
                 () -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
@@ -47,10 +47,16 @@ public class StoreService {
             throw new ConflictException(ErrorCode.MAX_STORE_LIMIT_EXCEEDED);
         }
 
+        if (storeSaveRequestDto.getOpenTime().isAfter(storeSaveRequestDto.getClosedTime()) ||
+                storeSaveRequestDto.getOpenTime().equals(storeSaveRequestDto.getClosedTime())) {
+            throw new BadRequestException(ErrorCode.INVALID_OPENTIME_CLOSEDTIME);
+        }
+
         Store store = Store.builder()
-                .storeName(storeSaveRequestDto.getStoreName())
-                .storeAddress(storeSaveRequestDto.getStoreAddress())
-                .storeCategory(storeSaveRequestDto.getStoreCategory())
+                .user(findUser)
+                .name(storeSaveRequestDto.getName())
+                .address(storeSaveRequestDto.getAddress())
+                .storeCategory(storeCategory)
                 .minOrderPrice(storeSaveRequestDto.getMinOrderPrice())
                 .openTime(storeSaveRequestDto.getOpenTime())
                 .closedTime(storeSaveRequestDto.getClosedTime())
@@ -63,17 +69,17 @@ public class StoreService {
 
         return StoreSaveResponseDto.builder()
                 .id(saveStore.getId())
-                .storeName(saveStore.getStoreName())
+                .name(saveStore.getName())
                 .createdAt(saveStore.getCreatedAt())
                 .build();
     }
 
     @Transactional(readOnly = true)
-    public List<StoreFindAllResponseDto> findAllStore(String storeName) {
+    public List<StoreFindAllResponseDto> findAllStore(String name) {
         List<Store> stores;
 
-        if (storeName != null && !storeName.isBlank()) {
-            stores = storeRepository.findByStoreNameContaining(storeName);
+        if (name != null && !name.isBlank()) {
+            stores = storeRepository.findByStoreNameContaining(name);
         } else {
             stores = storeRepository.findAllStore();
         }
@@ -82,7 +88,7 @@ public class StoreService {
         for (Store store : stores) {
             dtos.add(StoreFindAllResponseDto.builder()
                     .id(store.getId())
-                    .storeName(store.getStoreName())
+                    .name(store.getName())
                     .storeCategory(store.getStoreCategory())
                     .minOrderPrice(store.getMinOrderPrice())
                     .averageRating(store.getAverageRating())
@@ -113,8 +119,8 @@ public class StoreService {
 
         return StoreFindOneResponseDto.builder()
                 .id(findStore.getId())
-                .storeName(findStore.getStoreName())
-                .storeAddress(findStore.getStoreAddress())
+                .name(findStore.getName())
+                .address(findStore.getAddress())
                 .storeCategory(findStore.getStoreCategory())
                 .minOrderPrice(findStore.getMinOrderPrice())
                 .openTime(findStore.getOpenTime())
@@ -126,7 +132,9 @@ public class StoreService {
                 .build();
     }
 
-    public StoreUpdateResponseDto updateStore(AuthUser authUser, Long storeId, @Valid StoreUpdateRequestDto storeUpdateRequestDto) {
+    public StoreUpdateResponseDto updateStore(AuthUser authUser, Long storeId, StoreUpdateRequestDto storeUpdateRequestDto) {
+        StoreCategory storeCategory = StoreCategory.of(storeUpdateRequestDto.getStoreCategory());
+
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(
                 () -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
@@ -141,10 +149,19 @@ public class StoreService {
 
         verifyStore(findStore);
 
+        if (!findUser.getId().equals(findStore.getUser().getId())) {
+            throw new UnauthorizedException(ErrorCode.NOT_STORE_OWNER);
+        }
+
+        if (storeUpdateRequestDto.getOpenTime().isAfter(storeUpdateRequestDto.getClosedTime()) ||
+                storeUpdateRequestDto.getOpenTime().equals(storeUpdateRequestDto.getClosedTime())) {
+            throw new BadRequestException(ErrorCode.INVALID_OPENTIME_CLOSEDTIME);
+        }
+
         findStore.updateStore(
-                storeUpdateRequestDto.getStoreName(),
-                storeUpdateRequestDto.getStoreAddress(),
-                storeUpdateRequestDto.getStoreCategory(),
+                storeUpdateRequestDto.getName(),
+                storeUpdateRequestDto.getAddress(),
+                storeCategory,
                 storeUpdateRequestDto.getMinOrderPrice(),
                 storeUpdateRequestDto.getOpenTime(),
                 storeUpdateRequestDto.getClosedTime()
@@ -154,8 +171,8 @@ public class StoreService {
 
         return StoreUpdateResponseDto.builder()
                 .id(savedStore.getId())
-                .storeName(savedStore.getStoreName())
-                .storeAddress(savedStore.getStoreAddress())
+                .name(savedStore.getName())
+                .address(savedStore.getAddress())
                 .storeCategory(savedStore.getStoreCategory())
                 .minOrderPrice(savedStore.getMinOrderPrice())
                 .openTime(savedStore.getOpenTime())
@@ -181,6 +198,10 @@ public class StoreService {
 
         verifyStore(findStore);
 
+        if (!findUser.getId().equals(findStore.getUser().getId())) {
+            throw new UnauthorizedException(ErrorCode.NOT_STORE_OWNER);
+        }
+
         findStore.deleteStore(true);
 
         findUser.decreaseStoreCount();
@@ -189,7 +210,7 @@ public class StoreService {
 
     public void verifyUser(User findUser) {
         if (findUser.isDeleted()) {
-            throw new UnauthorizedException(ErrorCode.DELETED_USER);
+            throw new GoneException(ErrorCode.USER_ALREADY_DELETED);
         }
     }
 
@@ -198,5 +219,4 @@ public class StoreService {
             throw new GoneException(ErrorCode.STORE_CLOSED);
         }
     }
-
 }

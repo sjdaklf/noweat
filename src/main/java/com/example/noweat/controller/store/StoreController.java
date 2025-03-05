@@ -9,8 +9,7 @@ import com.example.noweat.dto.store.response.StoreUpdateResponseDto;
 import com.example.noweat.global.argumentResolver.AuthUser;
 import com.example.noweat.service.store.StoreService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +35,9 @@ public class StoreController {
 
     @GetMapping("/stores")
     public ResponseEntity<List<StoreFindAllResponseDto>> findAllStore(
-            @RequestParam(required = false) String storeName
+            @RequestParam(required = false) String name
     ) {
-        List<StoreFindAllResponseDto> StoreFindAllResponseDto = storeService.findAllStore(storeName);
+        List<StoreFindAllResponseDto> StoreFindAllResponseDto = storeService.findAllStore(name);
         return new ResponseEntity<>(StoreFindAllResponseDto, HttpStatus.OK);
     }
 

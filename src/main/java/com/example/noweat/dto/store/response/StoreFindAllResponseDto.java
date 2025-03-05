@@ -11,15 +11,15 @@ import java.time.LocalTime;
 public class StoreFindAllResponseDto {
 
     private final Long id;
-    private final String storeName;
+    private final String name;
     private final StoreCategory storeCategory;
     private final Long minOrderPrice;
     private final Double averageRating;
 
     @Builder
-    public StoreFindAllResponseDto(Long id, String storeName, StoreCategory storeCategory, Long minOrderPrice, Double averageRating) {
+    public StoreFindAllResponseDto(Long id, String name, StoreCategory storeCategory, Long minOrderPrice, Double averageRating) {
         this.id = id;
-        this.storeName = storeName;
+        this.name = name;
         this.storeCategory = storeCategory;
         this.minOrderPrice = minOrderPrice;
         this.averageRating = averageRating;
