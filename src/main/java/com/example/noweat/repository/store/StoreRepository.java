@@ -16,7 +16,4 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 
     @Query("SELECT s FROM Store s WHERE s.isClosed = false")
     List<Store> findAllStore();
-
-    @Query("SELECT count(s) > 0 FROM Store s WHERE s.id = :storeId AND s.isClosed = false")
-    boolean existsStoreById(@Param("storeId") Long storeId);
 }

@@ -1,6 +1,5 @@
 package com.example.noweat.dto.store.request;
 
-import com.example.noweat.domain.store.StoreCategory;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -16,7 +15,7 @@ public class StoreSaveRequestDto {
     @NotBlank(message = "가게 주소는 필수 값 입니다.")
     private String address;
 
-    @NotNull(message = "가게 카테고리는 필수 값 입니다.")
+    @NotBlank(message = "가게 카테고리는 필수 값 입니다.")
     private String storeCategory;
 
     @NotNull(message = "가게 최소 주문 금액은 필수 값 입니다.")

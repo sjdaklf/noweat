@@ -32,14 +32,14 @@ public class MenuService {
     @Transactional
     public MenuSaveResponseDto saveMenu(AuthUser authUser, Long storeId, MenuSaveRequestDto request) {
 
+        if (!authUser.getUserRole().equals(UserRole.OWNER)) { // 사용자 역할이 OWNER 가 아니면 예외
+            throw new UnauthorizedException(ErrorCode.NOT_OWNER);
+        }
+
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() ->
                 new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
         verifyUser(findUser); // 탈퇴한 유저인지 확인
-
-        if (!findUser.getUserRole().equals(UserRole.OWNER)) { // 사용자 역할이 OWNER 가 아니면 예외
-            throw new BadRequestException(ErrorCode.INVALID_USER_ROLE);
-        }
 
         Store findStore = storeRepository.findById(storeId).orElseThrow(() ->
                 new NotFoundException(ErrorCode.STORE_NOT_EXIST));
@@ -74,9 +74,10 @@ public class MenuService {
     @Transactional(readOnly = true)
     public List<MenuResponseDto> findAllMenu(Long storeId) {
 
-        if (!storeRepository.existsStoreById(storeId)) { // store가 없을 때 (폐업된 가게는 조회하지 않음)
-            throw new NotFoundException(ErrorCode.STORE_NOT_EXIST);
-        }
+        Store findStore = storeRepository.findById(storeId).orElseThrow(() ->
+                new NotFoundException(ErrorCode.STORE_NOT_EXIST));
+
+        verifyStore(findStore); // 폐업한 가게인지 확인
 
         List<Menu> findMenus = menuRepository.findMenuByStoreId(storeId);
 
@@ -87,14 +88,14 @@ public class MenuService {
 
     public MenuUpdateResponseDto updateMenu(AuthUser authUser, Long menuId, MenuUpdateRequestDto request) {
 
+        if (!authUser.getUserRole().equals(UserRole.OWNER)) { // 사용자 역할이 OWNER 가 아니면 예외
+            throw new UnauthorizedException(ErrorCode.NOT_OWNER);
+        }
+
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() ->
                 new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
         verifyUser(findUser); // 탈퇴한 유저인지 확인
-
-        if (!findUser.getUserRole().equals(UserRole.OWNER)) { // 사용자 역할이 OWNER 가 아니면 예외
-            throw new BadRequestException(ErrorCode.INVALID_USER_ROLE);
-        }
 
         Menu findMenu = menuRepository.findById(menuId).orElseThrow(() ->
                 new NotFoundException(ErrorCode.MENU_NOT_EXIST));
@@ -120,14 +121,14 @@ public class MenuService {
     @Transactional
     public void deleteMenu(AuthUser authUser, Long menuId) {
 
+        if (!authUser.getUserRole().equals(UserRole.OWNER)) { // 사용자 역할이 OWNER 가 아니면 예외
+            throw new UnauthorizedException(ErrorCode.NOT_OWNER);
+        }
+
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() ->
                 new NotFoundException(ErrorCode.NOT_FOUND_USER));
 
         verifyUser(findUser); // 탈퇴한 유저인지 확인
-
-        if (!findUser.getUserRole().equals(UserRole.OWNER)) { // 사용자 역할이 OWNER 가 아니면 예외
-            throw new BadRequestException(ErrorCode.INVALID_USER_ROLE);
-        }
 
         Menu findMenu = menuRepository.findById(menuId).orElseThrow(() ->
                 new NotFoundException(ErrorCode.MENU_NOT_EXIST));
