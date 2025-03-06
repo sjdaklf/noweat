@@ -72,7 +72,7 @@ public class MenuServiceTest {
 
         given(userRepository.findById(any())).willReturn(Optional.of(user));
         given(storeRepository.findById(any())).willReturn(Optional.of(store));
-        given(menuRepository.existsByUser_IdAndName(any(), any())).willReturn(false);
+        given(menuRepository.existsByStore_IdAndName(any(), any())).willReturn(false);
         given(menuRepository.save(any())).willReturn(menu);
 
         // when
@@ -86,7 +86,7 @@ public class MenuServiceTest {
 
         verify(userRepository, times(1)).findById(any());
         verify(storeRepository, times(1)).findById(any());
-        verify(menuRepository, times(1)).existsByUser_IdAndName(any(), any());
+        verify(menuRepository, times(1)).existsByStore_IdAndName(any(), any());
         verify(menuRepository, times(1)).save(any());
     }
 
@@ -333,7 +333,7 @@ public class MenuServiceTest {
 
         given(userRepository.findById(any())).willReturn(Optional.of(user));
         given(storeRepository.findById(any())).willReturn(Optional.of(store));
-        given(menuRepository.existsByUser_IdAndName(any(), any())).willReturn(true);
+        given(menuRepository.existsByStore_IdAndName(any(), any())).willReturn(true);
 
         // when, then
         assertThatThrownBy(() -> menuService.saveMenu(authUser, storeId, saveRequest)).isInstanceOf(ConflictException.class);

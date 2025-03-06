@@ -50,7 +50,7 @@ public class MenuService {
 
         verifyStore(findStore); // 폐업한 가게인지 확인
 
-        if (menuRepository.existsByUser_IdAndName(findUser.getId(), request.getName())) { // 중복된 메뉴 검증
+        if (menuRepository.existsByStore_IdAndName(findUser.getId(), request.getName())) { // 중복된 메뉴 검증
             throw new ConflictException(ErrorCode.DUPLICATE_MENU);
         }
 

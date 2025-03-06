@@ -26,7 +26,7 @@ public class MenuController {
     @PostMapping("stores/{storeId}/menus")
     public ResponseEntity<MenuSaveResponseDto> saveMenu(
             AuthUser authUser,
-            @PathVariable Long storeId,
+            @PathVariable("storeId") Long storeId,
             @Valid @RequestBody MenuSaveRequestDto request
     ) {
         return ResponseEntity.ok(menuService.saveMenu(authUser, storeId, request));
@@ -34,7 +34,7 @@ public class MenuController {
 
     @GetMapping("stores/{storeId}/menus")
     public ResponseEntity<List<MenuResponseDto>> findAllMenu(
-            @PathVariable Long storeId
+            @PathVariable("storeId") Long storeId
     ) {
         return ResponseEntity.ok(menuService.findAllMenu(storeId));
     }
@@ -42,7 +42,7 @@ public class MenuController {
     @PutMapping("menus/{menuId}")
     public ResponseEntity<MenuUpdateResponseDto> updateMenu(
             AuthUser authUser,
-            @PathVariable Long menuId,
+            @PathVariable("menuId") Long menuId,
             @Valid @RequestBody MenuUpdateRequestDto request
     ) {
         return ResponseEntity.ok(menuService.updateMenu(authUser, menuId, request));
@@ -51,7 +51,7 @@ public class MenuController {
     @DeleteMapping("menus/{menuId}")
     public void deleteMenu(
             AuthUser authUser,
-            @PathVariable Long menuId
+            @PathVariable("menuId") Long menuId
     ) {
         menuService.deleteMenu(authUser, menuId);
     }

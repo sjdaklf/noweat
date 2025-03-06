@@ -19,7 +19,7 @@ import java.util.Date;
 public class JwtUtil {
 
     private static final String BEARER_PREFIX = "Bearer ";
-    private static final long ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 30 ;
+    private static final long ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 120 ;
     private static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 14;
 
     @Value("${jwt.secret.key}")

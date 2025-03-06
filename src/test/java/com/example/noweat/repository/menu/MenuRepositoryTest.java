@@ -92,7 +92,7 @@ public class MenuRepositoryTest {
     @Test
     @Transactional
     @DisplayName("중복된 메뉴가 있는지 조회")
-    void existsByUser_IdAndName() {
+    void existsByStore_IdAndName() {
         // given
         String menuName = "메뉴이름";
 
@@ -107,7 +107,7 @@ public class MenuRepositoryTest {
         menuRepository.save(menu);
 
         // when
-        boolean result = menuRepository.existsByUser_IdAndName(1L, menuName);
+        boolean result = menuRepository.existsByStore_IdAndName(1L, menuName);
 
         // then
         assertTrue(result);

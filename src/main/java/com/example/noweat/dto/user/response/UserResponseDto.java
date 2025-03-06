@@ -1,6 +1,7 @@
 package com.example.noweat.dto.user.response;
 
 import com.example.noweat.domain.user.UserRole;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import java.time.LocalDateTime;
 
@@ -10,7 +11,11 @@ public class UserResponseDto {
     private String name;
     private String address;
     private UserRole userRole;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 
     public UserResponseDto(Long id, String name, String address, UserRole userRole, LocalDateTime createdAt, LocalDateTime updatedAt) {
