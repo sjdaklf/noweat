@@ -3,7 +3,6 @@ package com.example.noweat.domain.store;
 import com.example.noweat.domain.common.entity.BaseEntity;
 import com.example.noweat.domain.user.User;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -79,7 +78,7 @@ public class Store extends BaseEntity {
         this.ratingSum -= rating;
     }
 
-    public void addViewCount(){
+    public void addReviewCount(){
         this.reviewCount++;
     }
 

@@ -28,8 +28,8 @@ public class ReviewController {
     }
 
     @GetMapping("/stores/{storeId}/reviews")
-    public ResponseEntity<List<ReviewListResponseDto>> findAllReviews(@PathVariable("storeId") Long storeId, @RequestParam(value = "minRating", required = false) Long minRating,
-                                                                      @RequestParam(value = "maxRating", required = false) Long maxRating){
+    public ResponseEntity<List<ReviewListResponseDto>> findAllReviews(@PathVariable("storeId") Long storeId, @RequestParam(value = "minRating", required = false) Integer minRating,
+                                                                      @RequestParam(value = "maxRating", required = false) Integer maxRating){
         List<ReviewListResponseDto> reviewListResponseDtos = reviewService.findAllReviews(storeId, minRating, maxRating);
         return new ResponseEntity<>(reviewListResponseDtos, HttpStatus.OK);
     }
