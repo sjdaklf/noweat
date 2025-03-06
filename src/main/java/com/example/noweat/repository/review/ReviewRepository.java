@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findReviewsByUserId(Long userId);
+
+    boolean existsByOrder_Id(Long orderId);
 }

@@ -39,8 +39,12 @@ public class Store extends BaseEntity {
 
     private boolean isClosed;
 
+    private Long ratingSum;
+
+    private Long reviewCount;
+
     @Builder
-    public Store(User user, String name, String address, StoreCategory storeCategory, Long minOrderPrice, Double averageRating, LocalTime openTime, LocalTime closedTime, boolean isClosed) {
+    public Store(User user, String name, String address, StoreCategory storeCategory, Long minOrderPrice, Double averageRating, LocalTime openTime, LocalTime closedTime, boolean isClosed, Long ratingSum, Long reviewCount) {
         this.user = user;
         this.name = name;
         this.address = address;
@@ -50,6 +54,8 @@ public class Store extends BaseEntity {
         this.openTime = openTime;
         this.closedTime = closedTime;
         this.isClosed = isClosed;
+        this.ratingSum = ratingSum;
+        this.reviewCount = reviewCount;
     }
 
     public void updateStore(String name, String address, StoreCategory storeCategory, Long minOrderPrice, LocalTime openTime, LocalTime closedTime) {
@@ -63,5 +69,17 @@ public class Store extends BaseEntity {
 
     public void deleteStore(boolean isClosed) {
         this.isClosed = isClosed;
+    }
+
+    public void addRatingSum(Long rating){
+        this.ratingSum += rating;
+    }
+
+    public void addViewCount(){
+        this.reviewCount++;
+    }
+
+    public void calculateAverageRating(){
+        this.averageRating = (double)ratingSum/reviewCount;
     }
 }

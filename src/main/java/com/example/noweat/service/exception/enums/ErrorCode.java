@@ -15,6 +15,10 @@ public enum ErrorCode {
     INVALID_MENU_FOR_STORE("해당 가게에 속하지 않은 메뉴입니다.", HttpStatus.BAD_REQUEST),
     INVALID_OPENTIME_CLOSEDTIME("오픈 시간이 마감 시간보다 늦거나 같을 수 없습니다.", HttpStatus.BAD_REQUEST),
     INVALID_STORE_CATEGORY("유효하지 않은 카테고리입니다.", HttpStatus.BAD_REQUEST),
+    INVALID_STAR_RATING("유효하지 않은 별점 입니다.", HttpStatus.BAD_REQUEST),
+    REVIEW_PERIOD_EXPIRED("리뷰 작성 가능 기간이 만료되었습니다.", HttpStatus.BAD_REQUEST),
+    REVIEW_NOT_ALLOWED("주문이 완료되지 않아 리뷰를 작성할 수 없습니다.", HttpStatus.BAD_REQUEST),
+    ORDER_CANCEL_NOT_ALLOWED("유저는 주문 수락 전에만 주문을 취소할 수 있습니다.", HttpStatus.BAD_REQUEST),
 
     // 401 에러
     ACCESS_TOKEN_EXPIRED("만료된 AccessToken 입니다.", HttpStatus.UNAUTHORIZED),
@@ -47,6 +51,7 @@ public enum ErrorCode {
     SAME_AS_PREVIOUS_PASSWORD("새 비밀번호는 기존 비밀번호와 같을 수 없습니다.", HttpStatus.CONFLICT),
     MAX_STORE_LIMIT_EXCEEDED("가게를 최대 3개까지만 운영할 수 있습니다.", HttpStatus.CONFLICT),
     DUPLICATE_MENU("이미 생성된 메뉴입니다.", HttpStatus.CONFLICT),
+    REVIEW_ALREADY_EXISTS("해당 주문에는 이미 리뷰가 존재합니다.", HttpStatus.CONFLICT),
 
     // 410 에러
     USER_ALREADY_DELETED("탈퇴한 회원입니다.", HttpStatus.GONE),
