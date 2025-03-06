@@ -9,8 +9,10 @@ import com.example.noweat.domain.user.User;
 import com.example.noweat.domain.user.UserRole;
 import com.example.noweat.dto.review.request.ReviewCreateRequestDto;
 import com.example.noweat.dto.review.request.ReviewListRequestDto;
+import com.example.noweat.dto.review.request.ReviewUpdateRequestDto;
 import com.example.noweat.dto.review.response.ReviewCreateResponseDto;
 import com.example.noweat.dto.review.response.ReviewListResponseDto;
+import com.example.noweat.dto.review.response.ReviewUpdateResponseDto;
 import com.example.noweat.global.argumentResolver.AuthUser;
 import com.example.noweat.repository.order.OrderRepository;
 import com.example.noweat.repository.review.ReviewRepository;
@@ -102,6 +104,7 @@ public class ReviewService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public List<ReviewListResponseDto> findAllReviews(Long storeId, Long minRating, Long maxRating){
 
         Store findStore = storeRepository.findById(storeId).orElseThrow(() -> new NotFoundException(ErrorCode.STORE_NOT_EXIST));
@@ -143,6 +146,53 @@ public class ReviewService {
                 .createAt(review.getCreatedAt())
                 .updatedAt(review.getUpdatedAt())
                 .build()).collect(Collectors.toList());
+    }
+
+    public ReviewUpdateResponseDto updateReview(AuthUser authUser, Long reviewId, ReviewUpdateRequestDto reviewUpdateRequestDto){
+        // ONE, TWO, THREE, FOUR, FIVE 이외라면 예외가 발생
+        StarRating updateStarRating = StarRating.of(reviewUpdateRequestDto.getStarRating());
+
+        // USER만이 리뷰를 수정 가능
+        if(authUser.getUserRole() != UserRole.USER){
+            throw new ForbiddenException(ErrorCode.NOT_USER);
+        }
+
+        // 유저가 존재하는지, 유저가 삭제된 유저인지 판단
+        User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
+        verifyUser(findUser);
+
+        // 리뷰를 찾는다.
+        Review findReview = reviewRepository.findById(reviewId).orElseThrow(() -> new NotFoundException(ErrorCode.REVIEW_NOT_EXIST));
+
+        // 찾은 리뷰가 요청의 사용자의 것인지 검증
+        if(authUser.getId() != findReview.getUser().getId()){
+            throw new ForbiddenException(ErrorCode.NOT_USERS_REVIEW);
+        }
+
+        Review savedReview = updateStoreAndReview(reviewUpdateRequestDto, findReview, updateStarRating);
+
+        return ReviewUpdateResponseDto.builder()
+                .id(savedReview.getId())
+                .title(savedReview.getTitle())
+                .content(savedReview.getContent())
+                .starRating(savedReview.getStarRating())
+                .createAt(savedReview.getCreatedAt())
+                .updatedAt(savedReview.getUpdatedAt())
+                .build();
+    }
+
+    @Transactional
+    public Review updateStoreAndReview(ReviewUpdateRequestDto reviewUpdateRequestDto, Review findReview, StarRating updateStarRating) {
+        Store findStore = findReview.getStore();
+        findStore.minusRatingSum((long)(findReview.getStarRating().ordinal() + 1));
+        findStore.addRatingSum((long)(updateStarRating.ordinal() + 1));
+        findStore.calculateAverageRating();
+        storeRepository.save(findStore);
+
+        findReview.updateTitle(reviewUpdateRequestDto.getTitle());
+        findReview.updateContent(reviewUpdateRequestDto.getContent());
+        findReview.updateStarRating(updateStarRating);
+        return reviewRepository.save(findReview);
     }
 
     public void verifyUser(User findUser) {

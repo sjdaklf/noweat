@@ -39,6 +39,7 @@ public enum ErrorCode {
     STORE_NOT_MATCH("권한이 없는 가게입니다.", HttpStatus.FORBIDDEN),
     MENU_NOT_MATCH("권한이 없는 메뉴입니다.", HttpStatus.FORBIDDEN),
     NO_ACCESS_TO_OWNER_INFO("다른 사장의 정보에 접근할 수 없습니다.", HttpStatus.FORBIDDEN),
+    NOT_USERS_REVIEW("유저의 리뷰가 아닙니다.", HttpStatus.FORBIDDEN),
 
     // 404 에러
     NOT_FOUND_USER("존재하지 않는 유저입니다.", HttpStatus.NOT_FOUND),
@@ -46,6 +47,7 @@ public enum ErrorCode {
     STORE_NOT_EXIST("가게를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     MENU_NOT_EXIST("메뉴를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     ORDER_NOT_EXIST("주문을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    REVIEW_NOT_EXIST("리뷰를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
     //409 에러
     EMAIL_ALREADY_EXISTS("사용할 수 없는 이메일입니다.", HttpStatus.CONFLICT),
