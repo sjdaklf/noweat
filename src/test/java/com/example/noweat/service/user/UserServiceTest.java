@@ -72,7 +72,7 @@ class UserServiceTest {
     private Review review3;
 
     @Test
-    @DisplayName("정상적인 유저 조회 성공")
+    @DisplayName("유저가 자기 자신의 정보 조회 성공")
     void findUserTest() {
         // given
         user = new User();
@@ -86,8 +86,9 @@ class UserServiceTest {
         ReflectionTestUtils.setField(user, "createdAt", LocalDateTime.now());
         ReflectionTestUtils.setField(user, "updatedAt", LocalDateTime.now());
 
-        when(authUser.getId()).thenReturn(1L);
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        authUser = new AuthUser(1L, "a@a.com", UserRole.USER);
+
+        when(userRepository.findById(authUser.getId())).thenReturn(Optional.of(user));
 
         // when
         UserResponseDto result = userService.findUser(authUser, authUser.getId());
@@ -101,7 +102,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("정상적인 사장 조회 성공")
+    @DisplayName("사장이 자기 자신의 정보 조회 성공")
     void findOwnerTest() {
         // given
         user = new User();
@@ -116,8 +117,9 @@ class UserServiceTest {
         ReflectionTestUtils.setField(user, "createdAt", LocalDateTime.now());
         ReflectionTestUtils.setField(user, "updatedAt", LocalDateTime.now());
 
-        when(authUser.getId()).thenReturn(2L);
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        authUser = new AuthUser(2L, "a@a.com", UserRole.OWNER);
+
+        when(userRepository.findById(authUser.getId())).thenReturn(Optional.of(user));
 
         // when
         UserResponseDto result = userService.findUser(authUser, authUser.getId());
@@ -129,6 +131,35 @@ class UserServiceTest {
         assertEquals(user.getName(), responseDto.getName());
         assertEquals(user.getUserRole(), responseDto.getUserRole());
         assertEquals(user.getStoreCount(), responseDto.getStoreCount());
+    }
+
+    @Test
+    @DisplayName("사장이 유저의 정보 조회 성공")
+    void findUserTest2() {
+        // given
+        user = new User();
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(user, "email", "a@a.com");
+        ReflectionTestUtils.setField(user, "password", "0000");
+        ReflectionTestUtils.setField(user, "address", "서울");
+        ReflectionTestUtils.setField(user, "name", "유저");
+        ReflectionTestUtils.setField(user, "userRole", UserRole.USER);
+        ReflectionTestUtils.setField(user, "isDeleted", false);
+        ReflectionTestUtils.setField(user, "createdAt", LocalDateTime.now());
+        ReflectionTestUtils.setField(user, "updatedAt", LocalDateTime.now());
+
+        authUser = new AuthUser(2L, "a@a.com", UserRole.OWNER);
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        // when
+        UserResponseDto result = userService.findUser(authUser, user.getId());
+
+        // then
+        assertTrue(result instanceof UserFindResponseDto);
+        assertEquals(user.getId(), result.getId());
+        assertEquals(user.getName(), result.getName());
+        assertEquals(user.getUserRole(), result.getUserRole());
     }
 
     @Test
