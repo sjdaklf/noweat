@@ -45,4 +45,16 @@ public class Review extends BaseEntity {
         this.content = content;
         this.starRating = starRating;
     }
+
+    public void updateTitle(String title){
+        this.title = title;
+    }
+
+    public void updateContent(String content){
+        this.content = content;
+    }
+
+    public void updateStarRating(StarRating starRating){
+        this.starRating = starRating;
+    }
 }

@@ -1,8 +1,10 @@
 package com.example.noweat.controller.review;
 
 import com.example.noweat.dto.review.request.ReviewCreateRequestDto;
+import com.example.noweat.dto.review.request.ReviewUpdateRequestDto;
 import com.example.noweat.dto.review.response.ReviewCreateResponseDto;
 import com.example.noweat.dto.review.response.ReviewListResponseDto;
+import com.example.noweat.dto.review.response.ReviewUpdateResponseDto;
 import com.example.noweat.global.argumentResolver.AuthUser;
 import com.example.noweat.service.review.ReviewService;
 import jakarta.validation.Valid;
@@ -30,5 +32,11 @@ public class ReviewController {
                                                                       @RequestParam(value = "maxRating", required = false) Long maxRating){
         List<ReviewListResponseDto> reviewListResponseDtos = reviewService.findAllReviews(storeId, minRating, maxRating);
         return new ResponseEntity<>(reviewListResponseDtos, HttpStatus.OK);
+    }
+
+    @PutMapping("/reviews/{reviewId}")
+    public ResponseEntity<ReviewUpdateResponseDto> updateReview(AuthUser authUser, @PathVariable("reviewId") Long reviewId, @Valid @RequestBody ReviewUpdateRequestDto reviewUpdateRequestDto){
+        ReviewUpdateResponseDto reviewUpdateResponseDto = reviewService.updateReview(authUser, reviewId, reviewUpdateRequestDto);
+        return new ResponseEntity<>(reviewUpdateResponseDto, HttpStatus.OK);
     }
 }

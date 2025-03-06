@@ -75,6 +75,10 @@ public class Store extends BaseEntity {
         this.ratingSum += rating;
     }
 
+    public void minusRatingSum(Long rating){
+        this.ratingSum -= rating;
+    }
+
     public void addViewCount(){
         this.reviewCount++;
     }
