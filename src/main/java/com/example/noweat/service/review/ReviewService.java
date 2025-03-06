@@ -8,19 +8,25 @@ import com.example.noweat.domain.store.Store;
 import com.example.noweat.domain.user.User;
 import com.example.noweat.domain.user.UserRole;
 import com.example.noweat.dto.review.request.ReviewCreateRequestDto;
+import com.example.noweat.dto.review.request.ReviewListRequestDto;
 import com.example.noweat.dto.review.response.ReviewCreateResponseDto;
+import com.example.noweat.dto.review.response.ReviewListResponseDto;
 import com.example.noweat.global.argumentResolver.AuthUser;
 import com.example.noweat.repository.order.OrderRepository;
 import com.example.noweat.repository.review.ReviewRepository;
+import com.example.noweat.repository.store.StoreRepository;
 import com.example.noweat.repository.user.UserRepository;
 import com.example.noweat.service.exception.*;
 import com.example.noweat.service.exception.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.expression.common.ExpressionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.util.PatternMatchUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +34,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
+    private final StoreRepository storeRepository;
 
     @Transactional
     public ReviewCreateResponseDto createReview(AuthUser authUser, Long orderId, ReviewCreateRequestDto reviewCreateRequestDto){
@@ -95,9 +102,72 @@ public class ReviewService {
                 .build();
     }
 
+    public List<ReviewListResponseDto> findAllReviews(Long storeId, Long minRating, Long maxRating){
+
+        Store findStore = storeRepository.findById(storeId).orElseThrow(() -> new NotFoundException(ErrorCode.STORE_NOT_EXIST));
+        verifyStore(findStore);
+
+        List<Review> reviews = reviewRepository.findAllByStore_IdOrderByCreatedAtDesc(storeId);
+
+        // 최대와 최소 별점 모두 null 아닐때만 동작
+        if(minRating != null && maxRating != null){
+            // 최소와 최대별점 둘 다 범위를 만족하는지 검사
+            if (!validateMinRating(minRating) || !validateMaxRating(maxRating)) {
+                throw new BadRequestException(ErrorCode.INVALID_RATING_RANGE);
+            }
+
+            if(minRating > maxRating){
+                throw new BadRequestException(ErrorCode.MIN_RATING_LARGER_THAN_MAX_RATING);
+            }
+
+            return reviews.stream()
+                    .filter(review -> {
+                        Long starRating = (long) (review.getStarRating().ordinal() + 1);
+                        return minRating <= starRating && starRating <= maxRating;
+                    })
+                    .map(review -> ReviewListResponseDto.builder()
+                    .id(review.getId())
+                    .title(review.getTitle())
+                    .content(review.getContent())
+                    .starRating(review.getStarRating())
+                    .createAt(review.getCreatedAt())
+                    .updatedAt(review.getUpdatedAt())
+                    .build()).collect(Collectors.toList());
+        }
+
+        return reviews.stream().map(review -> ReviewListResponseDto.builder()
+                .id(review.getId())
+                .title(review.getTitle())
+                .content(review.getContent())
+                .starRating(review.getStarRating())
+                .createAt(review.getCreatedAt())
+                .updatedAt(review.getUpdatedAt())
+                .build()).collect(Collectors.toList());
+    }
+
     public void verifyUser(User findUser) {
         if (findUser.isDeleted()) {
             throw new UnauthorizedException(ErrorCode.USER_ALREADY_DELETED);
         }
+    }
+
+    public void verifyStore(Store findStore) {
+        if (findStore.isClosed()) {
+            throw new GoneException(ErrorCode.STORE_CLOSED);
+        }
+    }
+
+    private boolean validateMinRating(Long minRating){
+        if(minRating < 1 || minRating > 5){
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateMaxRating(Long maxRating){
+        if(maxRating < 1 || maxRating > 5){
+            return false;
+        }
+        return true;
     }
 }
