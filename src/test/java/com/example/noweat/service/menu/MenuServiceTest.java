@@ -13,10 +13,7 @@ import com.example.noweat.global.argumentResolver.AuthUser;
 import com.example.noweat.repository.menu.MenuRepository;
 import com.example.noweat.repository.store.StoreRepository;
 import com.example.noweat.repository.user.UserRepository;
-import com.example.noweat.service.exception.BadRequestException;
-import com.example.noweat.service.exception.ForbiddenException;
-import com.example.noweat.service.exception.GoneException;
-import com.example.noweat.service.exception.NotFoundException;
+import com.example.noweat.service.exception.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,7 +60,6 @@ public class MenuServiceTest {
 
         User user = new User();
         ReflectionTestUtils.setField(user, "id", 1L);
-        ReflectionTestUtils.setField(user, "userRole", UserRole.OWNER);
 
         Store store = new Store();
         ReflectionTestUtils.setField(store, "user", user);
@@ -76,6 +72,7 @@ public class MenuServiceTest {
 
         given(userRepository.findById(any())).willReturn(Optional.of(user));
         given(storeRepository.findById(any())).willReturn(Optional.of(store));
+        given(menuRepository.existsByUser_IdAndName(any(), any())).willReturn(false);
         given(menuRepository.save(any())).willReturn(menu);
 
         // when
@@ -89,8 +86,8 @@ public class MenuServiceTest {
 
         verify(userRepository, times(1)).findById(any());
         verify(storeRepository, times(1)).findById(any());
+        verify(menuRepository, times(1)).existsByUser_IdAndName(any(), any());
         verify(menuRepository, times(1)).save(any());
-
     }
 
     @Test
@@ -98,22 +95,26 @@ public class MenuServiceTest {
     void findAllMenuTest() {
         // given
         long storeId = 1L;
-        MenuSaveRequestDto request = new MenuSaveRequestDto("메뉴이름", 1000L);
+        MenuSaveRequestDto request1 = new MenuSaveRequestDto("메뉴이름1", 1000L);
+        MenuSaveRequestDto request2 = new MenuSaveRequestDto("메뉴이름2", 1000L);
 
         List<Menu> menuList = new ArrayList<>();
 
+        Store store = new Store();
+
         Menu menu1 = new Menu();
-        ReflectionTestUtils.setField(menu1, "name", request.getName());
-        ReflectionTestUtils.setField(menu1, "price", request.getPrice());
+        ReflectionTestUtils.setField(menu1, "name", request1.getName());
+        ReflectionTestUtils.setField(menu1, "price", request1.getPrice());
         menuList.add(menu1);
 
         Menu menu2 = new Menu();
-        ReflectionTestUtils.setField(menu2, "name", request.getName());
-        ReflectionTestUtils.setField(menu2, "price", request.getPrice());
+        ReflectionTestUtils.setField(menu2, "name", request2.getName());
+        ReflectionTestUtils.setField(menu2, "price", request2.getPrice());
         menuList.add(menu2);
 
         List<MenuResponseDto> list = menuList.stream().map(menu -> new MenuResponseDto(menu.getId(), menu.getName(), menu.getPrice())).toList();
 
+        given(storeRepository.findById(any())).willReturn(Optional.of(store));
         given(menuRepository.findMenuByStoreId(any())).willReturn(menuList);
 
         // when
@@ -125,6 +126,7 @@ public class MenuServiceTest {
         assertEquals(list.get(1).getName(), allMenu.get(1).getName());
         assertEquals(list.get(1).getPrice(), allMenu.get(1).getPrice());
 
+        verify(storeRepository, times(1)).findById(any());
         verify(menuRepository, times(1)).findMenuByStoreId(any());
     }
 
@@ -139,7 +141,6 @@ public class MenuServiceTest {
 
         User user = new User();
         ReflectionTestUtils.setField(user, "id", 1L);
-        ReflectionTestUtils.setField(user, "userRole", UserRole.OWNER);
 
         Menu menu = new Menu();
         LocalDateTime localDateTime = LocalDateTime.now();
@@ -198,6 +199,22 @@ public class MenuServiceTest {
     }
 
     @Test
+    @DisplayName("사용자 역할이 OWNER가 아닐 때 예외")
+    void InvalidUserRoleExceptionTest() {
+        // given
+        long storeId = 1L;
+        long menuId = 1L;
+        AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
+        MenuSaveRequestDto saveRequest = new MenuSaveRequestDto("메뉴이름", 1000L);
+        MenuUpdateRequestDto updateRequest = new MenuUpdateRequestDto("메뉴수정이름", 2000L);
+
+        // when, then
+        assertThatThrownBy(() -> menuService.saveMenu(authUser, storeId, saveRequest)).isInstanceOf(UnauthorizedException.class);
+        assertThatThrownBy(() -> menuService.updateMenu(authUser, menuId, updateRequest)).isInstanceOf(UnauthorizedException.class);
+        assertThatThrownBy(() -> menuService.deleteMenu(authUser, menuId)).isInstanceOf(UnauthorizedException.class);
+    }
+
+    @Test
     @DisplayName("authUserId로 조회한 결과 User 조회 실패")
     void NotFoundUserExceptionTest() {
         // given
@@ -236,28 +253,6 @@ public class MenuServiceTest {
     }
 
     @Test
-    @DisplayName("사용자 역할이 OWNER가 아닐 때 예외")
-    void InvalidUserRoleExceptionTest() {
-        // given
-        long storeId = 1L;
-        long menuId = 1L;
-        AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
-        MenuSaveRequestDto saveRequest = new MenuSaveRequestDto("메뉴이름", 1000L);
-        MenuUpdateRequestDto updateRequest = new MenuUpdateRequestDto("메뉴수정이름", 2000L);
-
-        User user = new User();
-        ReflectionTestUtils.setField(user, "id", 1L);
-        ReflectionTestUtils.setField(user, "userRole", UserRole.USER);
-
-        given(userRepository.findById(any())).willReturn(Optional.of(user));
-
-        // when, then
-        assertThatThrownBy(() -> menuService.saveMenu(authUser, storeId, saveRequest)).isInstanceOf(BadRequestException.class);
-        assertThatThrownBy(() -> menuService.updateMenu(authUser, storeId, updateRequest)).isInstanceOf(BadRequestException.class);
-        assertThatThrownBy(() -> menuService.deleteMenu(authUser, menuId)).isInstanceOf(BadRequestException.class);
-    }
-
-    @Test
     @DisplayName("storeId로 조회를 한 결과 가게 조회 실패")
     void StoreNotExistExceptionTest() {
         // given
@@ -267,7 +262,6 @@ public class MenuServiceTest {
 
         User user = new User();
         ReflectionTestUtils.setField(user, "id", 1L);
-        ReflectionTestUtils.setField(user, "userRole", UserRole.OWNER);
 
         given(userRepository.findById(any())).willReturn(Optional.of(user));
         given(storeRepository.findById(any())).willReturn(Optional.empty());
@@ -287,13 +281,12 @@ public class MenuServiceTest {
 
         User user = new User();
         ReflectionTestUtils.setField(user, "id", 1L);
-        ReflectionTestUtils.setField(user, "userRole", UserRole.OWNER);
 
-        User findUser = new User();
-        ReflectionTestUtils.setField(findUser, "id", 2L);
+        User storeUser = new User();
+        ReflectionTestUtils.setField(storeUser, "id", 2L);
 
         Store store = new Store();
-        ReflectionTestUtils.setField(store, "user", findUser);
+        ReflectionTestUtils.setField(store, "user", storeUser);
 
         given(userRepository.findById(any())).willReturn(Optional.of(user));
         given(storeRepository.findById(any())).willReturn(Optional.of(store));
@@ -312,7 +305,6 @@ public class MenuServiceTest {
 
         User user = new User();
         ReflectionTestUtils.setField(user, "id", 1L);
-        ReflectionTestUtils.setField(user, "userRole", UserRole.OWNER);
 
         Store store = new Store();
         ReflectionTestUtils.setField(store, "user", user);
@@ -323,6 +315,28 @@ public class MenuServiceTest {
 
         // when, then
         assertThatThrownBy(() -> menuService.saveMenu(authUser, storeId, saveRequest)).isInstanceOf(GoneException.class);
+        assertThatThrownBy(() -> menuService.findAllMenu(storeId)).isInstanceOf(GoneException.class);
+    }
+
+    @Test
+    @DisplayName("중복된 이름의 메뉴일 경우 예외")
+    void DuplicateMenuExceptionTest() {
+        long storeId = 1L;
+        AuthUser authUser = new AuthUser(1L, "email", UserRole.OWNER);
+        MenuSaveRequestDto saveRequest = new MenuSaveRequestDto("메뉴이름", 1000L);
+
+        User user = new User();
+        ReflectionTestUtils.setField(user, "id", 1L);
+
+        Store store = new Store();
+        ReflectionTestUtils.setField(store, "user", user);
+
+        given(userRepository.findById(any())).willReturn(Optional.of(user));
+        given(storeRepository.findById(any())).willReturn(Optional.of(store));
+        given(menuRepository.existsByUser_IdAndName(any(), any())).willReturn(true);
+
+        // when, then
+        assertThatThrownBy(() -> menuService.saveMenu(authUser, storeId, saveRequest)).isInstanceOf(ConflictException.class);
     }
 
     @Test
@@ -335,7 +349,6 @@ public class MenuServiceTest {
 
         User user = new User();
         ReflectionTestUtils.setField(user, "id", 1L);
-        ReflectionTestUtils.setField(user, "userRole", UserRole.OWNER);
 
         given(userRepository.findById(any())).willReturn(Optional.of(user));
         given(menuRepository.findById(any())).willReturn(Optional.empty());
@@ -355,13 +368,12 @@ public class MenuServiceTest {
 
         User user = new User();
         ReflectionTestUtils.setField(user, "id", 1L);
-        ReflectionTestUtils.setField(user, "userRole", UserRole.OWNER);
 
-        User findUser = new User();
-        ReflectionTestUtils.setField(findUser, "id", 2L);
+        User storeUser = new User();
+        ReflectionTestUtils.setField(storeUser, "id", 2L);
 
         Menu menu = new Menu();
-        ReflectionTestUtils.setField(menu, "user", findUser);
+        ReflectionTestUtils.setField(menu, "user", storeUser);
 
         given(userRepository.findById(any())).willReturn(Optional.of(user));
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
@@ -381,7 +393,6 @@ public class MenuServiceTest {
 
         User user = new User();
         ReflectionTestUtils.setField(user, "id", 1L);
-        ReflectionTestUtils.setField(user, "userRole", UserRole.OWNER);
 
         Menu menu = new Menu();
         ReflectionTestUtils.setField(menu, "user", user);

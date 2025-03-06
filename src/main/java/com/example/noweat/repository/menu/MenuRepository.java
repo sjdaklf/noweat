@@ -1,15 +1,12 @@
 package com.example.noweat.repository.menu;
 
 import com.example.noweat.domain.menu.Menu;
-import com.example.noweat.domain.store.Store;
-import com.example.noweat.domain.order.Order;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-
 import java.util.Optional;
 
 public interface MenuRepository extends JpaRepository<Menu, Long> {

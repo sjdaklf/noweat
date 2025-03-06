@@ -3,6 +3,7 @@ package com.example.noweat.controller.menu;
 import com.example.noweat.domain.user.UserRole;
 import com.example.noweat.dto.menu.response.MenuResponseDto;
 import com.example.noweat.dto.menu.response.MenuSaveResponseDto;
+import com.example.noweat.dto.menu.response.MenuUpdateResponseDto;
 import com.example.noweat.global.jwt.JwtUtil;
 import com.example.noweat.service.menu.MenuService;
 import org.junit.jupiter.api.DisplayName;
@@ -20,8 +21,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -76,7 +76,6 @@ public class MenuControllerTest {
     void findAllMenuTest() throws Exception{
         // given
         long storeId = 1L;
-
         List<MenuResponseDto> menuList = List.of(
                 MenuResponseDto.builder()
                         .id(1L)
@@ -89,7 +88,7 @@ public class MenuControllerTest {
                         .price(2000L)
                         .build()
         );
-
+        given(menuService.findAllMenu(any())).willReturn(menuList);
 
         // when, then
         mockMvc.perform(get("/api/stores/{storeId}/menus", storeId))
@@ -101,5 +100,51 @@ public class MenuControllerTest {
                 .andExpect(jsonPath("$[1].id").value(menuList.get(1).getId()))
                 .andExpect(jsonPath("$[1].name").value(menuList.get(1).getName()))
                 .andExpect(jsonPath("$[1].price").value(menuList.get(1).getPrice()));
+    }
+
+    @Test
+    @DisplayName("메뉴 수정 테스트")
+    void updateMenuTest() throws Exception{
+        // given
+        long menuId = 1L;
+        LocalDateTime creatDateTime = LocalDateTime.of(2025, 3, 6, 9, 30);
+        LocalDateTime localDateTime = LocalDateTime.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        String accessToken = jwtUtil.createAccessToken(1L, "email", UserRole.OWNER);
+
+        MenuUpdateResponseDto response = MenuUpdateResponseDto.builder()
+                .name("메뉴수정이름")
+                .price(1000L)
+                .createdAt(creatDateTime)
+                .updatedAt(localDateTime)
+                .build();
+        given(menuService.updateMenu(any(), any(), any())).willReturn(response);
+
+        // when, then
+        mockMvc.perform(put("/api/menus/{menuId}", menuId)
+                        .header("Authorization", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+                        .content("{\"name\" : \"메뉴이름\"," +
+                                " \"price\" : \"1000\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(response.getName()))
+                .andExpect(jsonPath("$.price").value(response.getPrice()))
+                .andExpect(jsonPath("$.createdAt").value(dateTimeFormatter.format(creatDateTime)))
+                .andExpect(jsonPath("$.updatedAt").value(dateTimeFormatter.format(localDateTime)));
+    }
+
+    @Test
+    @DisplayName("메뉴 삭제 테스트")
+    void deleteMenuTest() throws Exception{
+        // given
+        long menuId = 1L;
+        String accessToken = jwtUtil.createAccessToken(1L, "email", UserRole.OWNER);
+
+        // when, then
+        mockMvc.perform(delete("/api/menus/{menuId}", menuId)
+                        .header("Authorization", accessToken))
+                .andExpect(status().isOk());
     }
 }
