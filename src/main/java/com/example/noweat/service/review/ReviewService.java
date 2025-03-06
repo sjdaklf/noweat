@@ -145,6 +145,9 @@ public class ReviewService {
     }
 
     public ReviewUpdateResponseDto updateReview(AuthUser authUser, Long reviewId, ReviewUpdateRequestDto reviewUpdateRequestDto){
+
+        LocalDateTime requestTime = LocalDateTime.now();
+
         // ONE, TWO, THREE, FOUR, FIVE 이외라면 예외가 발생
         StarRating updateStarRating = StarRating.of(reviewUpdateRequestDto.getStarRating());
 
@@ -163,6 +166,12 @@ public class ReviewService {
         // 찾은 리뷰가 요청의 사용자의 것인지 검증
         if(authUser.getId() != findReview.getUser().getId()){
             throw new ForbiddenException(ErrorCode.NOT_USERS_REVIEW);
+        }
+
+        // 리뷰가 작성된지 일주일이 지나면 리뷰를 작성 불가
+        LocalDateTime oneWeekBefore = requestTime.minusWeeks(1);
+        if(findReview.getCreatedAt().isBefore(oneWeekBefore)){
+            throw new BadRequestException(ErrorCode.REVIEW_UPDATE_PERIOD_EXPIRED);
         }
 
         Review savedReview = updateStoreAndReview(reviewUpdateRequestDto, findReview, updateStarRating);

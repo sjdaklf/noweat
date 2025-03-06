@@ -17,6 +17,7 @@ public enum ErrorCode {
     INVALID_STORE_CATEGORY("유효하지 않은 카테고리입니다.", HttpStatus.BAD_REQUEST),
     INVALID_STAR_RATING("유효하지 않은 별점 입니다.", HttpStatus.BAD_REQUEST),
     REVIEW_PERIOD_EXPIRED("리뷰 작성 가능 기간이 만료되었습니다.", HttpStatus.BAD_REQUEST),
+    REVIEW_UPDATE_PERIOD_EXPIRED("리뷰 수정 가능 기간이 만료되었습니다.", HttpStatus.BAD_REQUEST),
     REVIEW_NOT_ALLOWED("주문이 완료되지 않아 리뷰를 작성할 수 없습니다.", HttpStatus.BAD_REQUEST),
     ORDER_CANCEL_NOT_ALLOWED("유저는 주문 수락 전에만 주문을 취소할 수 있습니다.", HttpStatus.BAD_REQUEST),
     INVALID_RATING_RANGE("별점의 범위는 1~5 입니다.", HttpStatus.BAD_REQUEST),
