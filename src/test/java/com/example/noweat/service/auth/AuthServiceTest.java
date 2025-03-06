@@ -13,6 +13,7 @@ import com.example.noweat.global.config.PasswordEncoder;
 import com.example.noweat.global.jwt.JwtUtil;
 import com.example.noweat.repository.auth.RefreshTokenRepository;
 import com.example.noweat.repository.user.UserRepository;
+import com.example.noweat.service.exception.BadRequestException;
 import com.example.noweat.service.exception.ConflictException;
 import com.example.noweat.service.exception.NotFoundException;
 import com.example.noweat.service.exception.UnauthorizedException;
@@ -171,7 +172,7 @@ class AuthServiceTest {
         when(passwordEncoder.matches(any(), any())).thenReturn(false);
 
         // when, then
-        assertThatThrownBy(() -> authService.signinUser(requestDto)).isInstanceOf(UnauthorizedException.class);
+        assertThatThrownBy(() -> authService.signinUser(requestDto)).isInstanceOf(BadRequestException.class);
     }
 
     @Test
