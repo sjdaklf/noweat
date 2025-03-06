@@ -19,6 +19,8 @@ public enum ErrorCode {
     REVIEW_PERIOD_EXPIRED("리뷰 작성 가능 기간이 만료되었습니다.", HttpStatus.BAD_REQUEST),
     REVIEW_NOT_ALLOWED("주문이 완료되지 않아 리뷰를 작성할 수 없습니다.", HttpStatus.BAD_REQUEST),
     ORDER_CANCEL_NOT_ALLOWED("유저는 주문 수락 전에만 주문을 취소할 수 있습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_RATING_RANGE("별점의 범위는 1~5 입니다.", HttpStatus.BAD_REQUEST),
+    MIN_RATING_LARGER_THAN_MAX_RATING("최소 별점이 최대 별점보다 큽니다", HttpStatus.BAD_REQUEST),
 
     // 401 에러
     ACCESS_TOKEN_EXPIRED("만료된 AccessToken 입니다.", HttpStatus.UNAUTHORIZED),
