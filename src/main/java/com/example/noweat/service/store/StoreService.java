@@ -58,6 +58,10 @@ public class StoreService {
                 .address(storeSaveRequestDto.getAddress())
                 .storeCategory(storeCategory)
                 .minOrderPrice(storeSaveRequestDto.getMinOrderPrice())
+                .averageRating(0.0)
+                .isClosed(false)
+                .ratingSum(0L)
+                .reviewCount(0L)
                 .openTime(storeSaveRequestDto.getOpenTime())
                 .closedTime(storeSaveRequestDto.getClosedTime())
                 .build();

@@ -1,0 +1,103 @@
+package com.example.noweat.service.review;
+
+import com.example.noweat.domain.order.Order;
+import com.example.noweat.domain.order.OrderStatus;
+import com.example.noweat.domain.review.Review;
+import com.example.noweat.domain.review.StarRating;
+import com.example.noweat.domain.store.Store;
+import com.example.noweat.domain.user.User;
+import com.example.noweat.domain.user.UserRole;
+import com.example.noweat.dto.review.request.ReviewCreateRequestDto;
+import com.example.noweat.dto.review.response.ReviewCreateResponseDto;
+import com.example.noweat.global.argumentResolver.AuthUser;
+import com.example.noweat.repository.order.OrderRepository;
+import com.example.noweat.repository.review.ReviewRepository;
+import com.example.noweat.repository.user.UserRepository;
+import com.example.noweat.service.exception.*;
+import com.example.noweat.service.exception.enums.ErrorCode;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.time.LocalDateTime;
+
+@Service
+@RequiredArgsConstructor
+public class ReviewService {
+    private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
+
+    @Transactional
+    public ReviewCreateResponseDto createReview(AuthUser authUser, Long orderId, ReviewCreateRequestDto reviewCreateRequestDto){
+
+        LocalDateTime requestTime = LocalDateTime.now();
+
+        // ONE, TWO, THREE, FOUR, FIVE 이외라면 예외가 발생
+        StarRating starRating = StarRating.of(reviewCreateRequestDto.getStarRating());
+
+        // USER만이 리뷰를 작성 가능
+        if(authUser.getUserRole() != UserRole.USER){
+            throw new ForbiddenException(ErrorCode.NOT_USER);
+        }
+
+        // 유저가 존재하는지, 유저가 삭제된 유저인지 판단
+        User findUser = userRepository.findById(authUser.getId()).orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
+        verifyUser(findUser);
+
+        // 존재하는 주문인지 확인
+        Order findOrder = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_EXIST));
+
+        // 현재 유저의 주문인지 확인
+        if(authUser.getId() != findOrder.getUser().getId()){
+            throw new ForbiddenException(ErrorCode.NOT_USERS_ORDER);
+        }
+
+        // 리뷰가 존재하면 작성할 수 없음
+        if(reviewRepository.existsByOrder_Id(findOrder.getId())){
+            throw new ConflictException(ErrorCode.REVIEW_ALREADY_EXISTS);
+        }
+
+        // 주문의 상태가 COMPLETED 일 때 리뷰 작성이 가능함
+        if(findOrder.getOrderStatus() != OrderStatus.COMPLETED){
+            throw new BadRequestException(ErrorCode.REVIEW_NOT_ALLOWED);
+        }
+
+        // 주문이 완료된지 일주일이 지나면 리뷰를 작성 불가
+        LocalDateTime oneWeekBefore = requestTime.minusWeeks(1);
+        if(findOrder.getUpdatedAt().isBefore(oneWeekBefore)){
+            throw new BadRequestException(ErrorCode.REVIEW_PERIOD_EXPIRED);
+        }
+
+        Review review = Review.builder()
+                .user(findUser)
+                .store(findOrder.getStore())
+                .order(findOrder)
+                .title(reviewCreateRequestDto.getTitle())
+                .content(reviewCreateRequestDto.getContent())
+                .starRating(starRating)
+                .build();
+
+        Review savedReview = reviewRepository.save(review);
+
+        Store store = findOrder.getStore();
+        store.addRatingSum((long) (savedReview.getStarRating().ordinal() + 1));
+        store.addViewCount();
+        store.calculateAverageRating();
+
+        return ReviewCreateResponseDto.builder()
+                .id(savedReview.getId())
+                .title(savedReview.getTitle())
+                .content(savedReview.getContent())
+                .starRating(savedReview.getStarRating())
+                .createAt(savedReview.getCreatedAt())
+                .build();
+    }
+
+    public void verifyUser(User findUser) {
+        if (findUser.isDeleted()) {
+            throw new UnauthorizedException(ErrorCode.USER_ALREADY_DELETED);
+        }
+    }
+}

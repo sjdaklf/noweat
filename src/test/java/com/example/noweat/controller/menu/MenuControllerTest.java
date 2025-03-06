@@ -90,7 +90,6 @@ public class MenuControllerTest {
                         .build()
         );
 
-        given()
 
         // when, then
         mockMvc.perform(get("/api/stores/{storeId}/menus", storeId))

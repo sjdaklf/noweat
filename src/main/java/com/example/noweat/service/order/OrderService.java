@@ -193,6 +193,10 @@ public class OrderService {
             throw new ForbiddenException(ErrorCode.NOT_USERS_ORDER);
         }
 
+        if(findOrder.getOrderStatus() != OrderStatus.PENDING){
+            throw new BadRequestException(ErrorCode.ORDER_CANCEL_NOT_ALLOWED);
+        }
+
         orderRepository.deleteById(orderId);
     }
 
