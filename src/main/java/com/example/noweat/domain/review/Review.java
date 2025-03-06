@@ -33,7 +33,7 @@ public class Review extends BaseEntity {
 
     private String content;
 
-    @Enumerated(value = EnumType.STRING)
+    @Convert(converter = ReviewConverter.class)
     private StarRating starRating;
 
     @Builder
