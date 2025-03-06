@@ -7,12 +7,14 @@ import com.example.noweat.domain.user.User;
 import com.example.noweat.domain.user.UserRole;
 import com.example.noweat.dto.store.request.StoreSaveRequestDto;
 import com.example.noweat.dto.store.request.StoreUpdateRequestDto;
-import com.example.noweat.dto.store.response.*;
+import com.example.noweat.dto.store.response.StoreFindAllResponseDto;
+import com.example.noweat.dto.store.response.StoreFindOneResponseDto;
+import com.example.noweat.dto.store.response.StoreSaveResponseDto;
+import com.example.noweat.dto.store.response.StoreUpdateResponseDto;
 import com.example.noweat.global.argumentResolver.AuthUser;
 import com.example.noweat.repository.menu.MenuRepository;
 import com.example.noweat.repository.store.StoreRepository;
 import com.example.noweat.repository.user.UserRepository;
-import com.example.noweat.service.menu.MenuService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,9 +23,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -69,8 +73,8 @@ class StoreServiceTest {
         ReflectionTestUtils.setField(requestDto, "address", "서울시 중구");
         ReflectionTestUtils.setField(requestDto, "storeCategory", "KOREAN");
         ReflectionTestUtils.setField(requestDto, "minOrderPrice", 10000L);
-        ReflectionTestUtils.setField(requestDto, "openTime", LocalTime.now());
-        ReflectionTestUtils.setField(requestDto, "closedTime", LocalTime.now());
+        ReflectionTestUtils.setField(requestDto, "openTime", LocalTime.of(9, 0));
+        ReflectionTestUtils.setField(requestDto, "closedTime", LocalTime.of(21, 0));
 
         Store store = Store.builder()
                 .user(user)
@@ -240,8 +244,8 @@ class StoreServiceTest {
         ReflectionTestUtils.setField(requestDto, "address", "서울시 강남구");
         ReflectionTestUtils.setField(requestDto, "storeCategory", "KOREAN");
         ReflectionTestUtils.setField(requestDto, "minOrderPrice", 10000L);
-        ReflectionTestUtils.setField(requestDto, "openTime", LocalTime.now());
-        ReflectionTestUtils.setField(requestDto, "closedTime", LocalTime.now());
+        ReflectionTestUtils.setField(requestDto, "openTime", LocalTime.of(8, 30));
+        ReflectionTestUtils.setField(requestDto, "closedTime", LocalTime.of(21, 0));
 
 
         given(userRepository.findById(authUser.getId())).willReturn(Optional.of(user));
