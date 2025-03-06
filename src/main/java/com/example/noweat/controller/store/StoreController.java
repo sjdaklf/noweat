@@ -42,7 +42,7 @@ public class StoreController {
     }
 
     @GetMapping("/stores/{storeId}")
-    public ResponseEntity<StoreFindOneResponseDto> findOneStore(@PathVariable Long storeId) {
+    public ResponseEntity<StoreFindOneResponseDto> findOneStore(@PathVariable("storeId") Long storeId) {
         StoreFindOneResponseDto StoreFindOneResponseDto = storeService.findOneStore(storeId);
         return new ResponseEntity<>(StoreFindOneResponseDto, HttpStatus.OK);
     }
@@ -50,7 +50,7 @@ public class StoreController {
     @PatchMapping("/stores/{storeId}")
     public ResponseEntity<StoreUpdateResponseDto> updateStore(
             AuthUser authUser,
-            @PathVariable Long storeId,
+            @PathVariable("storeId") Long storeId,
             @Valid @RequestBody StoreUpdateRequestDto storeUpdateRequestDto
     ) {
         StoreUpdateResponseDto storeUpdateResponseDto = storeService.updateStore(authUser, storeId, storeUpdateRequestDto);
@@ -58,7 +58,7 @@ public class StoreController {
     }
 
     @DeleteMapping("/stores/{storeId}")
-    public void deleteStore(AuthUser authUser, @PathVariable Long storeId) {
+    public void deleteStore(AuthUser authUser, @PathVariable("storeId") Long storeId) {
         storeService.deleteStore(authUser, storeId);
     }
 }
