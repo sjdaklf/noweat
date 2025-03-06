@@ -33,7 +33,7 @@ public class MenuService {
     public MenuSaveResponseDto saveMenu(AuthUser authUser, Long storeId, MenuSaveRequestDto request) {
 
         if (!authUser.getUserRole().equals(UserRole.OWNER)) { // 사용자 역할이 OWNER 가 아니면 예외
-            throw new UnauthorizedException(ErrorCode.NOT_OWNER);
+            throw new ForbiddenException(ErrorCode.NOT_OWNER);
         }
 
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() ->
@@ -89,7 +89,7 @@ public class MenuService {
     public MenuUpdateResponseDto updateMenu(AuthUser authUser, Long menuId, MenuUpdateRequestDto request) {
 
         if (!authUser.getUserRole().equals(UserRole.OWNER)) { // 사용자 역할이 OWNER 가 아니면 예외
-            throw new UnauthorizedException(ErrorCode.NOT_OWNER);
+            throw new ForbiddenException(ErrorCode.NOT_OWNER);
         }
 
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() ->
@@ -122,7 +122,7 @@ public class MenuService {
     public void deleteMenu(AuthUser authUser, Long menuId) {
 
         if (!authUser.getUserRole().equals(UserRole.OWNER)) { // 사용자 역할이 OWNER 가 아니면 예외
-            throw new UnauthorizedException(ErrorCode.NOT_OWNER);
+            throw new ForbiddenException(ErrorCode.NOT_OWNER);
         }
 
         User findUser = userRepository.findById(authUser.getId()).orElseThrow(() ->
