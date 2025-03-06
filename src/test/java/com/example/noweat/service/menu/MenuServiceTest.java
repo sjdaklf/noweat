@@ -209,9 +209,9 @@ public class MenuServiceTest {
         MenuUpdateRequestDto updateRequest = new MenuUpdateRequestDto("메뉴수정이름", 2000L);
 
         // when, then
-        assertThatThrownBy(() -> menuService.saveMenu(authUser, storeId, saveRequest)).isInstanceOf(UnauthorizedException.class);
-        assertThatThrownBy(() -> menuService.updateMenu(authUser, menuId, updateRequest)).isInstanceOf(UnauthorizedException.class);
-        assertThatThrownBy(() -> menuService.deleteMenu(authUser, menuId)).isInstanceOf(UnauthorizedException.class);
+        assertThatThrownBy(() -> menuService.saveMenu(authUser, storeId, saveRequest)).isInstanceOf(ForbiddenException.class);
+        assertThatThrownBy(() -> menuService.updateMenu(authUser, menuId, updateRequest)).isInstanceOf(ForbiddenException.class);
+        assertThatThrownBy(() -> menuService.deleteMenu(authUser, menuId)).isInstanceOf(ForbiddenException.class);
     }
 
     @Test
