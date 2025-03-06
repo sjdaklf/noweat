@@ -152,7 +152,7 @@ public class UserService {
 
         verifyUser(findUser);
 
-        findUser.updateUserNameAndAddress(userUpdateNameAndAddressRequestDto.getUsername(), userUpdateNameAndAddressRequestDto.getUserAddress());
+        findUser.updateUserNameAndAddress(userUpdateNameAndAddressRequestDto.getName(), userUpdateNameAndAddressRequestDto.getAddress());
 
         User savedUser = userRepository.save(findUser);
 
