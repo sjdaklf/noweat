@@ -16,6 +16,8 @@ import com.example.noweat.global.config.PasswordEncoder;
 import com.example.noweat.repository.review.ReviewRepository;
 import com.example.noweat.repository.store.StoreRepository;
 import com.example.noweat.repository.user.UserRepository;
+import com.example.noweat.service.exception.ForbiddenException;
+import com.example.noweat.service.exception.GoneException;
 import com.example.noweat.service.exception.NotFoundException;
 import com.example.noweat.service.exception.UnauthorizedException;
 import com.example.noweat.service.exception.enums.ErrorCode;
@@ -181,7 +183,7 @@ class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         // When & Then
-        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> {
+        GoneException exception = assertThrows(GoneException.class, () -> {
             userService.findUser(authUser, authUser.getId());
         });
 
