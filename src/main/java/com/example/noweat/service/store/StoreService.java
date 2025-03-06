@@ -102,7 +102,6 @@ public class StoreService {
         return dtos;
     }
 
-
     @Transactional(readOnly = true)
     public StoreFindOneResponseDto findOneStore(Long storeId) {
         Store findStore = storeRepository.findById(storeId).orElseThrow(
