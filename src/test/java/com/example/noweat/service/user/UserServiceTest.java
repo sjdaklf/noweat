@@ -266,12 +266,12 @@ class UserServiceTest {
         assertNotNull(result);
         assertEquals(2, result.size());
 
-        assertEquals("test1", result.get(0).getStoreName());
+        assertEquals("test1", result.get(0).getName());
         assertEquals(StoreCategory.KOREAN, result.get(0).getStoreCategory());
         assertEquals(13000L, result.get(0).getMinOrderPrice());
         assertEquals(4.8, result.get(0).getAverageRating());
 
-        assertEquals("test2", result.get(1).getStoreName());
+        assertEquals("test2", result.get(1).getName());
         assertEquals(StoreCategory.KOREAN, result.get(1).getStoreCategory());
         assertEquals(12000L, result.get(1).getMinOrderPrice());
         assertEquals(4.3, result.get(1).getAverageRating());
