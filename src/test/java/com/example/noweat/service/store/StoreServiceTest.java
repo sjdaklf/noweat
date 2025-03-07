@@ -307,5 +307,4 @@ class StoreServiceTest {
         verify(storeRepository, times(1)).findById(store.getId());
         verify(userRepository, times(1)).save(user);
     }
-
 }
